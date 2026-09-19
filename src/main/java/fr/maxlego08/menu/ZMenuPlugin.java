@@ -496,37 +496,40 @@ public class ZMenuPlugin extends ZPlugin implements fr.maxlego08.menu.api.MenuPl
     @Override
     public void onDisable() {
 
-        this.context.shutdown();
+
+        this.safeDisable("metrics", this.context::shutdown);
 
         if (this.packetManager != null) {
-            this.safeHook("packetevents", () -> this.packetManager.onDisable());
+            this.safeDisable("packetevents", () -> this.packetManager.onDisable());
         }
 
         this.preDisable();
 
-        if (this.vinventoryManager != null) this.vinventoryManager.close();
-        this.inventoriesPlayer.restoreAllInventories();
+        if (this.vinventoryManager != null) this.safeDisable("inventories", this.vinventoryManager::close);
+        this.safeDisable("player inventories", this.inventoriesPlayer::restoreAllInventories);
 
-        if (this.storageManager != null) this.storageManager.flush();
+        if (this.storageManager != null) this.safeDisable("storage", this.storageManager::flush);
 
-        Configuration.getInstance().save(this.getConfig(), this.configFile);
+        this.safeDisable("configuration", () -> Configuration.getInstance().save(this.getConfig(), this.configFile));
 
-        YamlFileCache.clearCache();
+        this.safeDisable("file cache", YamlFileCache::clearCache);
 
-        if (this.websiteManager != null) this.websiteManager.onDisable();
-        
+        if (this.websiteManager != null) this.safeDisable("website manager", this.websiteManager::onDisable);
+
         if (!this.isMockBukkitServer) {
-            NMSMenuPacketListener nmsMenuPacketListener = NMSMenuPacketListener.get();
-            if (nmsMenuPacketListener != null) {
-                nmsMenuPacketListener.shutdown();
-            }
+            this.safeDisable("packet listener", () -> {
+                NMSMenuPacketListener nmsMenuPacketListener = NMSMenuPacketListener.get();
+                if (nmsMenuPacketListener != null) {
+                    nmsMenuPacketListener.shutdown();
+                }
+            });
         }
 
-        OfflinePlayerCache.uninstall(this);
+        this.safeDisable("offline player cache", () -> OfflinePlayerCache.uninstall(this));
 
-        this.itemManager.unloadListeners();
+        this.safeDisable("item manager", this.itemManager::unloadListeners);
 
-        this.getServer().getServicesManager().unregisterAll(this);
+        this.safeDisable("services", () -> this.getServer().getServicesManager().unregisterAll(this));
 
         this.postDisable();
     }

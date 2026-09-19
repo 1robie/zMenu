@@ -184,6 +184,14 @@ public abstract class ZPlugin extends JavaPlugin {
         this.failedHooks.clear();
     }
 
+    protected void safeDisable(String name, Runnable action) {
+        try {
+            action.run();
+        } catch (Throwable throwable) {
+            Logger.error("Failed to shut down " + name + " cleanly.", throwable);
+        }
+    }
+
     /**
      * Register command
      *
