@@ -44,6 +44,6 @@ public class DiscordLoader extends ActionLoader {
         DiscordWebhookChecker.verifyAsync(webhookUrl, file.getAbsolutePath());
 
         DiscordConfiguration config = new DiscordConfiguration(webhookUrl, avatarUrl, message, username, DiscordEmbedConfiguration.convertToEmbedObjects(values));
-        return new DiscordAction(config);
+        return new DiscordAction(config, values);
     }
 }

@@ -30,6 +30,6 @@ public class BookLoader extends ActionLoader {
         Map<?, List<String>> maps = (Map<?, List<String>>) accessor.getObject("lines", new HashMap<>());
         maps.forEach((page, currentLine) -> lines.add(String.join("<newline>", currentLine)));
 
-        return new OpenBookAction(title, author, lines);
+        return new OpenBookAction(title, author, lines, maps);
     }
 }

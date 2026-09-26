@@ -1,23 +1,31 @@
 package fr.maxlego08.menu.requirement.actions;
 
-import fr.maxlego08.menu.zcore.logger.Logger;
-
 import fr.maxlego08.menu.api.button.Button;
 import fr.maxlego08.menu.api.configuration.Configuration;
 import fr.maxlego08.menu.api.engine.InventoryEngine;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.common.utils.ActionHelper;
+import fr.maxlego08.menu.zcore.logger.Logger;
 import fr.maxlego08.menu.zcore.utils.discord.DiscordConfiguration;
 import fr.maxlego08.menu.zcore.utils.discord.DiscordWebhook;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
+import java.util.List;
+import java.util.Map;
+
 public class DiscordAction extends ActionHelper {
 
     private final DiscordConfiguration configuration;
+    private final List<Map<?, ?>> rawEmbeds;
 
     public DiscordAction(DiscordConfiguration configuration) {
+        this(configuration, null);
+    }
+
+    public DiscordAction(DiscordConfiguration configuration, List<Map<?, ?>> rawEmbeds) {
         this.configuration = configuration;
+        this.rawEmbeds = rawEmbeds;
     }
 
     @Override
@@ -36,5 +44,20 @@ public class DiscordAction extends ActionHelper {
                 }
             }
         });
+    }
+
+    @Override
+    protected void serializeProperties(@NonNull Map<String, Object> map) {
+        List<?> embeds = this.configuration.embeds();
+        boolean hasEmbeds = embeds != null && !embeds.isEmpty();
+        if (hasEmbeds && this.rawEmbeds == null) {
+            throw new UnsupportedOperationException("The discord action cannot be serialized: its embeds were given without their original configuration");
+        }
+        map.put("type", "discord");
+        map.put("webhook", this.configuration.webhookUrl());
+        if (this.configuration.avatarUrl() != null) map.put("avatar", this.configuration.avatarUrl());
+        if (this.configuration.content() != null) map.put("message", this.configuration.content());
+        if (this.configuration.username() != null) map.put("username", this.configuration.username());
+        if (this.rawEmbeds != null && !this.rawEmbeds.isEmpty()) map.put("embeds", this.rawEmbeds);
     }
 }

@@ -25,7 +25,8 @@ public class TeleportAction extends Action {
     @Override
     protected void serializeProperties(@NonNull Map<String, Object> map) {
         map.put("type", "teleport");
-        if (!TeleportLoader.DEFAULT_WORLD.equals(this.location.getWorld().getName())) map.put("world", this.worldName);
+        String worldName = this.location.getWorld() == null ? null : this.location.getWorld().getName();
+        if (worldName != null && !TeleportLoader.DEFAULT_WORLD.equals(worldName)) map.put("world", worldName);
         if (this.location.getX() != 0.0) map.put("x", this.location.getX());
         if (this.location.getY() != 0.0) map.put("y", this.location.getY());
         if (this.location.getZ() != 0.0) map.put("z", this.location.getZ());
