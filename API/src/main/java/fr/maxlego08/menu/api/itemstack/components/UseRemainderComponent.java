@@ -23,6 +23,11 @@ public class UseRemainderComponent extends ItemComponent {
     }
 
     @Override
+    public @Nullable Object serialize() {
+        return this.menuItemStack.serializeToMap();
+    }
+
+    @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta != null) {

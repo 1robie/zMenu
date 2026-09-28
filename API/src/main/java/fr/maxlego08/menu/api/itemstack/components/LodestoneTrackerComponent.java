@@ -14,6 +14,9 @@ import org.bukkit.inventory.meta.CompassMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @SuppressWarnings("unused")
 public class LodestoneTrackerComponent extends ItemComponent {
     private final @NotNull ResolvableBoolean lodestoneTracked;
@@ -30,6 +33,14 @@ public class LodestoneTrackerComponent extends ItemComponent {
 
     public @Nullable ResolvableLodestoneLocation getLodestoneLocation() {
         return this.lodestoneLocation;
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (!Boolean.TRUE.equals(this.lodestoneTracked.serialize())) map.put("tracked", this.lodestoneTracked.serialize());
+        if (this.lodestoneLocation != null) map.put("target", this.lodestoneLocation.serialize());
+        return map;
     }
 
     @Override

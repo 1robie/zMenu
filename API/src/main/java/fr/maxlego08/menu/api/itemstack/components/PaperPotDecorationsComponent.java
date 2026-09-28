@@ -2,6 +2,7 @@ package fr.maxlego08.menu.api.itemstack.components;
 
 import fr.maxlego08.menu.api.context.BuildContext;
 import fr.maxlego08.menu.api.itemstack.ItemComponent;
+import fr.maxlego08.menu.api.utils.resolvable.Resolvable;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableRegistryEntry;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.PotDecorations;
@@ -10,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
 
 public class PaperPotDecorationsComponent extends ItemComponent {
     private static final int SIDES = 4;
@@ -30,5 +33,10 @@ public class PaperPotDecorationsComponent extends ItemComponent {
             types[i] = resolved;
         }
         itemStack.setData(DataComponentTypes.POT_DECORATIONS, PotDecorations.potDecorations(types[0], types[1], types[2], types[3]));
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        return Resolvable.serializeList(Arrays.asList(this.sides));
     }
 }

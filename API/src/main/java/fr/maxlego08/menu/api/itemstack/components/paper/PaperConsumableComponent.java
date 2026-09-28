@@ -16,7 +16,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PaperConsumableComponent extends ItemComponent {
     private final ResolvableFloat consumeSeconds;
@@ -52,5 +54,20 @@ public class PaperConsumableComponent extends ItemComponent {
         }
 
         itemStack.setData(DataComponentTypes.CONSUMABLE, consumable.build());
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        Object consumeSeconds = this.consumeSeconds.serialize();
+        if (!Float.valueOf(1.6f).equals(consumeSeconds)) map.put("consume-seconds", consumeSeconds);
+        Object animation = this.animation.serialize();
+        if (!ItemUseAnimation.EAT.name().equals(animation)) map.put("animation", animation);
+        Object sound = this.sound.serialize();
+        if (!"minecraft:entity.generic.eat".equals(sound)) map.put("consume-sound", sound);
+        Object hasConsumeParticles = this.hasConsumeParticles.serialize();
+        if (!Boolean.TRUE.equals(hasConsumeParticles)) map.put("has-consume-particles", hasConsumeParticles);
+        map.put("on-consume-effects", Resolvable.serializeList(this.effects));
+        return map;
     }
 }

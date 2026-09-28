@@ -11,6 +11,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @SuppressWarnings("unused")
 public class FoodComponent extends ItemComponent {
 
@@ -56,6 +59,17 @@ public class FoodComponent extends ItemComponent {
             
             itemStack.setItemMeta(itemMeta);
         }
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("nutrition", this.nutrition.serialize());
+        map.put("saturation", this.saturation.serialize());
+        if (this.canAlwaysEat != null && (this.canAlwaysEat.isDynamic() || !Boolean.FALSE.equals(this.canAlwaysEat.getResolvedValue()))) {
+            map.put("can-always-eat", this.canAlwaysEat.serialize());
+        }
+        return map;
     }
 
 }

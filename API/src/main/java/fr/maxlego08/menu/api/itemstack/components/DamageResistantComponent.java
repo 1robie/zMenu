@@ -9,6 +9,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @SuppressWarnings("unused")
 public class DamageResistantComponent extends ItemComponent {
     private final @NotNull ResolvableDamageTypeTag damageType;
@@ -29,5 +32,12 @@ public class DamageResistantComponent extends ItemComponent {
         this.applyResolvable(context, itemMeta::setDamageResistant, this.damageType);
 
         itemStack.setItemMeta(itemMeta);
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("types", this.damageType.serialize());
+        return map;
     }
 }

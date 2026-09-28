@@ -21,4 +21,9 @@ public class PaperProvidesBannerPatternsComponent extends ItemComponent {
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         itemStack.setData(DataComponentTypes.PROVIDES_BANNER_PATTERNS, this.patterns);
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.patterns.key().asString();
+    }
 }

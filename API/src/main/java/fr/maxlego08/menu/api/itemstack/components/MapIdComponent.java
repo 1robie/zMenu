@@ -31,6 +31,11 @@ public class MapIdComponent extends ItemComponent {
     }
 
     @Override
+    public @Nullable Object serialize() {
+        return this.mapId.serialize();
+    }
+
+    @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         Integer value = this.mapId.resolve(context);
         if (value == null) return;

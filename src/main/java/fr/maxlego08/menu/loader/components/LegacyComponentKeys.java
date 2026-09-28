@@ -29,7 +29,9 @@ public final class LegacyComponentKeys {
             // tooltip-display
             "hide_tooltip", "hidden_components",
             // death-protection
-            "death_effects"
+            "death_effects",
+            // tool, as written in Minecraft
+            "default_mining_speed", "damage_per_block", "can_destroy_blocks_in_creative", "correct_for_drops"
     );
 
     private static final Set<String> DATA_COMPONENTS = Set.of(

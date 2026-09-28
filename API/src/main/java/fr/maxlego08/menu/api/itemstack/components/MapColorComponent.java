@@ -26,6 +26,11 @@ public class MapColorComponent extends ItemComponent {
     }
 
     @Override
+    public @Nullable Object serialize() {
+        return this.color.serialize();
+    }
+
+    @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         boolean apply = ItemUtil.editMeta(itemStack, MapMeta.class, mapMeta -> {
             this.applyResolvable(context, mapMeta::setColor, this.color);

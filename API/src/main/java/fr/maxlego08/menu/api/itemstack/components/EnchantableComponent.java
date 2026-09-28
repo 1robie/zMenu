@@ -9,6 +9,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @SuppressWarnings("unused")
 public class EnchantableComponent extends ItemComponent {
     private final @NotNull ResolvableInt value;
@@ -29,5 +32,12 @@ public class EnchantableComponent extends ItemComponent {
         this.applyResolvable(context, itemMeta::setEnchantable, this.value);
 
         itemStack.setItemMeta(itemMeta);
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("value", this.value.serialize());
+        return map;
     }
 }

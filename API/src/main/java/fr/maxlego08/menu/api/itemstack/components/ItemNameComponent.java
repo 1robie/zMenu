@@ -31,4 +31,9 @@ public class ItemNameComponent extends ItemComponent {
             itemStack.setItemMeta(itemMeta);
         }
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.itemName.serialize();
+    }
 }

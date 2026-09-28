@@ -13,7 +13,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CustomModelDataComponent extends ItemComponent {
     private final @NotNull List<@NotNull ResolvableColor> colors;
@@ -60,5 +62,15 @@ public class CustomModelDataComponent extends ItemComponent {
 
             itemStack.setItemMeta(itemMeta);
         }
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (!this.floats.isEmpty()) map.put("floats", Resolvable.serializeList(this.floats));
+        if (!this.flags.isEmpty()) map.put("flags", Resolvable.serializeList(this.flags));
+        if (!this.strings.isEmpty()) map.put("strings", Resolvable.serializeList(this.strings));
+        if (!this.colors.isEmpty()) map.put("colors", Resolvable.serializeList(this.colors));
+        return map;
     }
 }

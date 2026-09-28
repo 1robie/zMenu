@@ -14,7 +14,9 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class FireworksComponent extends ItemComponent {
@@ -45,5 +47,15 @@ public class FireworksComponent extends ItemComponent {
         });
         if (!apply && Configuration.enableDebug)
             Logger.info("Could not apply FireworksComponent to itemStack: " + itemStack.getType().name());
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (this.power.isDynamic() || !Integer.valueOf(1).equals(this.power.getResolvedValue())) {
+            map.put("flight-duration", this.power.serialize());
+        }
+        if (!this.effects.isEmpty()) map.put("explosions", Resolvable.serializeList(this.effects));
+        return map;
     }
 }

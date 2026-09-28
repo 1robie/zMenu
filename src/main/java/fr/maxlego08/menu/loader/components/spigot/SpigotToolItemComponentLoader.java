@@ -6,18 +6,30 @@ import fr.maxlego08.menu.api.context.MenuItemStackContext;
 import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.itemstack.components.ToolComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
-import fr.maxlego08.menu.api.utils.itemstack.ZToolRule;
+import fr.maxlego08.menu.api.utils.resolvable.Resolvable;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
-import org.bukkit.*;
+import fr.maxlego08.menu.api.utils.resolvable.paper.ResolvableRegistryKeySet;
+import fr.maxlego08.menu.api.utils.resolvable.paper.ResolvableToolRule;
+import fr.maxlego08.menu.api.utils.resolvable.paper.TagKeySetResolvable;
+import fr.maxlego08.menu.zcore.logger.Logger;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.set.RegistryKeySet;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
+import org.bukkit.block.BlockType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @AutoComponentLoader
 @SinceVersion("1.20.5")
@@ -36,85 +48,60 @@ public class SpigotToolItemComponentLoader extends ItemComponentLoader {
         ResolvableInt damagePerBlock = this.asResolvableInt(componentSection, "damage-per-block", 1);
         ResolvableBoolean canDestroyBlocksInCreative = this.asResolvableBoolean(componentSection, "can-destroy-blocks-in-creative", true);
 
-        List<Map<?, ?>> rawRulesList = componentSection.getMapList("rules");
-        List<ZToolRule<Material>> materialRules = new ArrayList<>();
-        List<ZToolRule<Collection<Material>>> materialsRules = new ArrayList<>();
-        List<ZToolRule<Tag<Material>>> tagRules = new ArrayList<>();
+        Integer fixedDamagePerBlock = damagePerBlock.getResolvedValue();
+        if (fixedDamagePerBlock != null && fixedDamagePerBlock < 0) {
+            Logger.info("damage-per-block of the tool component at " + path + " in " + file.getName() + " must not be negative, 1 is used.", Logger.LogType.WARNING);
+            damagePerBlock = ResolvableInt.of(1);
+        }
 
-        for (var rawRuleMap : rawRulesList) {
+        List<ResolvableToolRule> rules = new ArrayList<>();
+        for (Map<?, ?> rawRule : componentSection.getMapList("rules")) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> ruleMap = (Map<String, Object>) rawRuleMap;
-
-            float miningSpeed = ((Number) ruleMap.getOrDefault("speed", 1.0)).floatValue();
-            boolean correctForDrops = (boolean) ruleMap.getOrDefault("correct-for-drops", false);
-
-            Object blocks = ruleMap.get("blocks");
-
-            if (blocks instanceof String blockString) {
-                this.processBlockString(blockString, miningSpeed, correctForDrops, materialRules, tagRules);
-            } else if (blocks instanceof List<?> blockList) {
-                this.processBlockList(blockList, miningSpeed, correctForDrops, materialsRules, tagRules);
-            }
+            Map<String, Object> rule = (Map<String, Object>) rawRule;
+            this.loadRule(rule, rules, path, file);
         }
 
-        return new ToolComponent(defaultMiningSpeed, damagePerBlock, canDestroyBlocksInCreative,
-                materialRules, materialsRules, tagRules);
+        return new ToolComponent(defaultMiningSpeed, damagePerBlock, canDestroyBlocksInCreative, rules);
     }
 
-    private void processBlockString(String blockString, float miningSpeed, boolean correctForDrops,
-                                    List<ZToolRule<Material>> materialRules,
-                                    List<ZToolRule<Tag<Material>>> tagRules) {
-        this.parseNamespacedKey(blockString).ifPresent(key -> {
-            this.getTag(key).ifPresentOrElse(
-                    tag -> tagRules.add(new ZToolRule<>(tag, miningSpeed, correctForDrops)),
-                    () -> this.getMaterial(key).ifPresent(
-                            material -> materialRules.add(new ZToolRule<>(material, miningSpeed, correctForDrops))
-                    )
-            );
-        });
-    }
+    private void loadRule(Map<String, Object> rule, List<ResolvableToolRule> rules, String path, File file) {
+        // Optional, as in Minecraft: an unset value overrides nothing
+        ResolvableFloat speed = ResolvableFloat.of(rule, "speed", null);
+        ResolvableBoolean correctForDrops = ResolvableBoolean.of(rule, "correct-for-drops", null);
 
-    private void processBlockList(List<?> blockList, float miningSpeed, boolean correctForDrops,
-                                  List<ZToolRule<Collection<Material>>> materialsRules,
-                                  List<ZToolRule<Tag<Material>>> tagRules) {
-        List<Material> materials = new ArrayList<>();
-
-        for (Object blockObj : blockList) {
-            if (!(blockObj instanceof String blockName)) continue;
-
-            this.parseNamespacedKey(blockName).ifPresent(key -> {
-                Optional<Tag<Material>> tagOpt = this.getTag(key);
-
-                if (tagOpt.isPresent()) {
-                    if (!materials.isEmpty()) {
-                        materialsRules.add(new ZToolRule<>(new ArrayList<>(materials), miningSpeed, correctForDrops));
-                        materials.clear();
+        Object blocks = rule.get("blocks");
+        if (blocks instanceof String block) {
+            Resolvable<RegistryKeySet<BlockType>> blockSet = this.isTag(block) ? TagKeySetResolvable.of(RegistryKey.BLOCK, block) : ResolvableRegistryKeySet.typedKeySet(RegistryKey.BLOCK, block);
+            rules.add(new ResolvableToolRule(blockSet, speed, correctForDrops));
+        } else if (blocks instanceof List<?> blockList) {
+            List<String> group = new ArrayList<>();
+            for (Object entry : blockList) {
+                if (entry == null) continue;
+                String block = entry.toString();
+                if (block.startsWith("#")) {
+                    if (!group.isEmpty()) {
+                        rules.add(new ResolvableToolRule(ResolvableRegistryKeySet.typedKeySet(RegistryKey.BLOCK, group), speed, correctForDrops));
+                        group = new ArrayList<>();
                     }
-                    tagRules.add(new ZToolRule<>(tagOpt.get(), miningSpeed, correctForDrops));
+                    rules.add(new ResolvableToolRule(TagKeySetResolvable.of(RegistryKey.BLOCK, block), speed, correctForDrops));
                 } else {
-                    this.getMaterial(key).ifPresent(materials::add);
+                    group.add(block);
                 }
-            });
-        }
-
-        if (!materials.isEmpty()) {
-            materialsRules.add(new ZToolRule<>(materials, miningSpeed, correctForDrops));
+            }
+            if (!group.isEmpty()) rules.add(new ResolvableToolRule(ResolvableRegistryKeySet.typedKeySet(RegistryKey.BLOCK, group), speed, correctForDrops));
+        } else {
+            Logger.info("A rule of the tool component at " + path + " in " + file.getName() + " has no blocks, it is ignored.", Logger.LogType.WARNING);
         }
     }
 
-    private Optional<NamespacedKey> parseNamespacedKey(String keyString) {
-        return Optional.ofNullable(NamespacedKey.fromString(keyString));
-    }
-
-    private Optional<Tag<Material>> getTag(NamespacedKey key) {
-        return Optional.ofNullable(Bukkit.getTag("items", key, Material.class));
-    }
-
-    private Optional<Material> getMaterial(NamespacedKey key) {
-        try {
-            return Optional.of(Registry.MATERIAL.getOrThrow(key));
-        } catch (IllegalArgumentException e) {
-            return Optional.empty();
-        }
+    /**
+     * A tag is written with a {@code #}. Without it, a single value naming an existing block tag is
+     * still read as that tag, as zMenu always did.
+     */
+    private boolean isTag(String value) {
+        if (value.startsWith("#")) return true;
+        if (Resolvable.isExpression(value)) return false;
+        NamespacedKey key = NamespacedKey.fromString(value);
+        return key != null && Bukkit.getTag(Tag.REGISTRY_BLOCKS, key, Material.class) != null;
     }
 }

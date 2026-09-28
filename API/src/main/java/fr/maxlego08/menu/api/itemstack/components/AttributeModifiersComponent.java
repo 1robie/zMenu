@@ -15,7 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class AttributeModifiersComponent extends ItemComponent {
@@ -51,6 +53,17 @@ public class AttributeModifiersComponent extends ItemComponent {
         if (resolved == null || resolved.isEmpty()) return;
         AttributeMergeStrategy attributeMergeStrategy = Resolvable.resolve(context, this.mergeStrategy);
         this.attributApplier.applyAttributesModern(itemStack, resolved, this.plugin, attributeMergeStrategy);
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (this.mergeStrategy != null) {
+            Object mergeStrategy = this.mergeStrategy.serialize();
+            if (mergeStrategy != null && !"".equals(mergeStrategy)) map.put("attribute-merge-strategy", mergeStrategy);
+        }
+        if (this.resolvableAttributes != null) map.put("modifiers", Resolvable.serializeList(this.resolvableAttributes));
+        return map;
     }
 
 }

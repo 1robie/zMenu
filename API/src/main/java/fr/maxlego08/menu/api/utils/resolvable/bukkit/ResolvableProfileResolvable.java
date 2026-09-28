@@ -11,9 +11,7 @@ import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class ResolvableProfileResolvable implements Resolvable<ResolvableProfile> {
 
@@ -92,6 +90,25 @@ public class ResolvableProfileResolvable implements Resolvable<ResolvableProfile
         return builder.build();
     }
 
+    @Override
+    public @NotNull Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (this.name != null) map.put("name", this.name.serialize());
+        if (this.uuid != null) map.put("id", this.uuid.serialize());
+        if (this.properties != null && !this.properties.isEmpty()) {
+            List<Object> serializedProperties = new ArrayList<>(this.properties.size());
+            for (ProfilePropertyEntry entry : this.properties) {
+                serializedProperties.add(entry.serialize());
+            }
+            map.put("properties", serializedProperties);
+        }
+        if (this.texture != null) map.put("texture", this.texture.serialize());
+        if (this.cape != null) map.put("cape", this.cape.serialize());
+        if (this.elytra != null) map.put("elytra", this.elytra.serialize());
+        if (this.model != null) map.put("model", this.model.serialize());
+        return map;
+    }
+
     public static final class ProfilePropertyEntry {
         private final @NotNull ResolvableString name;
         private final @NotNull ResolvableString value;
@@ -108,6 +125,17 @@ public class ResolvableProfileResolvable implements Resolvable<ResolvableProfile
             String resolvedValue = this.value.resolve(context);
             if (resolvedName == null || resolvedValue == null) return null;
             return new ProfileProperty(resolvedName, resolvedValue, Resolvable.resolve(context, this.signature));
+        }
+
+        /**
+         * Writes the property map the profile loader reads: {@code name}, {@code value} and, when set, {@code signature}.
+         */
+        public @NotNull Map<String, Object> serialize() {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("name", this.name.serialize());
+            map.put("value", this.value.serialize());
+            if (this.signature != null) map.put("signature", this.signature.serialize());
+            return map;
         }
     }
 }

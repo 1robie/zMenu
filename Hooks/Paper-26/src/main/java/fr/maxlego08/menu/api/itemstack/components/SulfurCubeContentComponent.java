@@ -27,4 +27,9 @@ public class SulfurCubeContentComponent extends ItemComponent {
         SulfurCubeContent content = SulfurCubeContent.sulfurCubeContent(this.menuItemStack.build(player));
         itemStack.setData(DataComponentTypes.SULFUR_CUBE_CONTENT, content);
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.menuItemStack.serializeToMap();
+    }
 }

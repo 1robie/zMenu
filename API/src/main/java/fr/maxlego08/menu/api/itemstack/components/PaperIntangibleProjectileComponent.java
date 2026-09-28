@@ -20,4 +20,9 @@ public class PaperIntangibleProjectileComponent extends ItemComponent {
         if (this.intangible)
             itemStack.setData(DataComponentTypes.INTANGIBLE_PROJECTILE);
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.intangible;
+    }
 }

@@ -30,4 +30,9 @@ public class GliderComponent extends ItemComponent {
 
         itemStack.setItemMeta(itemMeta);
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.glider.serialize();
+    }
 }

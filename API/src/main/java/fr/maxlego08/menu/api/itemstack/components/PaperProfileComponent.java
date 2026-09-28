@@ -21,4 +21,9 @@ public class PaperProfileComponent extends ItemComponent {
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         Resolvable.applyResolvable(context, this.resolvable, resolved -> itemStack.setData(DataComponentTypes.PROFILE, resolved));
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.resolvable == null ? null : this.resolvable.serialize();
+    }
 }

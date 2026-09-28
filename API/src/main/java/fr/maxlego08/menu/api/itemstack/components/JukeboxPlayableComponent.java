@@ -26,6 +26,11 @@ public class JukeboxPlayableComponent extends ItemComponent {
     }
 
     @Override
+    public @Nullable Object serialize() {
+        return this.songKey.serialize();
+    }
+
+    @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         NamespacedKey key = this.songKey.resolve(context);
         if (key == null) return;

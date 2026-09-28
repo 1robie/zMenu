@@ -23,4 +23,9 @@ public class PaperCustomNameComponent extends ItemComponent {
             itemStack.setData(DataComponentTypes.CUSTOM_NAME, value);
         });
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.customName.serialize();
+    }
 }

@@ -39,4 +39,9 @@ public class BannerPatternsComponent extends ItemComponent {
         }
     }
 
+    @Override
+    public @Nullable Object serialize() {
+        return this.resolvablePatterns == null ? null : Resolvable.serializeList(this.resolvablePatterns);
+    }
+
 }

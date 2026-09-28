@@ -22,4 +22,9 @@ public class PaperDeathProtectionComponent extends ItemComponent {
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         Resolvable.applyResolvable(context, this.deathProtectionResolvable, resolved -> itemStack.setData(DataComponentTypes.DEATH_PROTECTION, resolved));
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.deathProtectionResolvable.serialize();
+    }
 }

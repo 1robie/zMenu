@@ -34,4 +34,9 @@ public class FireworkExplosionComponent extends ItemComponent {
             Logger.info("Could not apply FireworkExplosionComponent to itemStack: " + itemStack.getType().name());
         }
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.effect.serialize();
+    }
 }

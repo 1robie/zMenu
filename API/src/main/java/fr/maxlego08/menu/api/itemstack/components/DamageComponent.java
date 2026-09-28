@@ -40,4 +40,9 @@ public class DamageComponent extends ItemComponent {
         }
     }
 
+    @Override
+    public @Nullable Object serialize() {
+        return this.damage.serialize();
+    }
+
 }

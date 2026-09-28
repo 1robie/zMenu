@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,5 +39,20 @@ public class EnchantementsComponent extends ItemComponent {
         if (!resolved.isEmpty()) {
             itemStack.addEnchantments(resolved);
         }
+    }
+
+    /**
+     * Each entry writes itself as {@code enchantment: level}; the section holds them all.
+     */
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (ResolvableEnchantmentEntry entry : this.enchantments) {
+            if (!(entry.serialize() instanceof Map<?, ?> serializedEntry)) {
+                throw new UnsupportedOperationException("The enchantment entry " + entry + " cannot be serialized");
+            }
+            serializedEntry.forEach((enchantment, level) -> map.put(String.valueOf(enchantment), level));
+        }
+        return map;
     }
 }

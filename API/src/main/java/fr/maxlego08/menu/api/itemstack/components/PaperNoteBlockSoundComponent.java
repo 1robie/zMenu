@@ -21,4 +21,9 @@ public class PaperNoteBlockSoundComponent extends ItemComponent {
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         Resolvable.applyResolvable(context, this.resolvableNamespacedKey, resolved -> itemStack.setData(DataComponentTypes.NOTE_BLOCK_SOUND, resolved));
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.resolvableNamespacedKey == null ? null : this.resolvableNamespacedKey.serialize();
+    }
 }

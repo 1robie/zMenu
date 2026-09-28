@@ -28,6 +28,11 @@ public class RecipesComponent extends ItemComponent {
     }
 
     @Override
+    public @Nullable Object serialize() {
+        return Resolvable.serializeList(this.recipes);
+    }
+
+    @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         boolean apply = ItemUtil.editMeta(itemStack, KnowledgeBookMeta.class, knowledgeBookMeta -> {
 

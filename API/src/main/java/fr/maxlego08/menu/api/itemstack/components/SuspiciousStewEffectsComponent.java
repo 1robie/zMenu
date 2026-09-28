@@ -4,6 +4,7 @@ import fr.maxlego08.menu.api.configuration.Configuration;
 import fr.maxlego08.menu.api.context.BuildContext;
 import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.utils.ItemUtil;
+import fr.maxlego08.menu.api.utils.resolvable.Resolvable;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvablePotionEffect;
 import fr.maxlego08.menu.zcore.logger.Logger;
 import org.bukkit.entity.Player;
@@ -26,6 +27,11 @@ public class SuspiciousStewEffectsComponent extends ItemComponent {
 
     public @NotNull List<ResolvablePotionEffect> getEffects() {
         return this.effects;
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        return Resolvable.serializeList(this.effects);
     }
 
     @Override

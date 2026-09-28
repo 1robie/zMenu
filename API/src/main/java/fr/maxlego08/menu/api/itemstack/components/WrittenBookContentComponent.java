@@ -14,7 +14,10 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class WrittenBookContentComponent extends ItemComponent {
@@ -44,6 +47,24 @@ public class WrittenBookContentComponent extends ItemComponent {
 
     public @NotNull List<@NotNull ResolvableString> getPages() {
         return this.pages;
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (this.title != null) map.put("title", this.title.serialize());
+        if (this.author != null) map.put("author", this.author.serialize());
+        if (this.generation != null) map.put("generation", this.generation.serialize());
+        if (!this.pages.isEmpty()) {
+            List<Map<String, Object>> rawPages = new ArrayList<>();
+            for (ResolvableString page : this.pages) {
+                Map<String, Object> rawPage = new LinkedHashMap<>();
+                rawPage.put("raw", page.serialize());
+                rawPages.add(rawPage);
+            }
+            map.put("pages", rawPages);
+        }
+        return map;
     }
 
     @Override

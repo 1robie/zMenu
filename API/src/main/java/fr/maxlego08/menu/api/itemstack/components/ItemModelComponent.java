@@ -35,4 +35,9 @@ public class ItemModelComponent extends ItemComponent {
             itemStack.setItemMeta(itemMeta);
         }
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.itemModel.serialize();
+    }
 }

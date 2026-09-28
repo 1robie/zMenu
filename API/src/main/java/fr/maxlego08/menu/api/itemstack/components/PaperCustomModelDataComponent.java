@@ -14,7 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PaperCustomModelDataComponent extends ItemComponent {
     private final List<ResolvableFloat> floats;
@@ -40,5 +42,15 @@ public class PaperCustomModelDataComponent extends ItemComponent {
         Resolvable.applyResolvable(context, this.colorList, builder::addColors);
 
         itemStack.setData(DataComponentTypes.CUSTOM_MODEL_DATA, builder.build());
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (!this.floats.isEmpty()) map.put("floats", Resolvable.serializeList(this.floats));
+        if (!this.booleans.isEmpty()) map.put("flags", Resolvable.serializeList(this.booleans));
+        if (!this.strings.isEmpty()) map.put("strings", Resolvable.serializeList(this.strings));
+        if (!this.colorList.isEmpty()) map.put("colors", Resolvable.serializeList(this.colorList));
+        return map;
     }
 }

@@ -40,4 +40,9 @@ public class DyeColorComponent extends ItemComponent {
             Logger.info("Could not apply DyeColorComponent to item: " + itemStack.getType().name() + " because it does not support colorable armor meta.");
         }
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.color.serialize();
+    }
 }

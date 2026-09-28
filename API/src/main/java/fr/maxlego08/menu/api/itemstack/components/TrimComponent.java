@@ -13,6 +13,9 @@ import org.bukkit.inventory.meta.ArmorMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @SuppressWarnings("unused")
 public class TrimComponent extends ItemComponent {
     private final @Nullable ResolvableArmorTrim resolvableArmorTrim;
@@ -23,6 +26,15 @@ public class TrimComponent extends ItemComponent {
 
     public @Nullable ResolvableArmorTrim getResolvableArmorTrim() {
         return this.resolvableArmorTrim;
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        if (this.resolvableArmorTrim == null) return null;
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("material", this.resolvableArmorTrim.material().serialize());
+        map.put("pattern", this.resolvableArmorTrim.pattern().serialize());
+        return map;
     }
 
     @Override

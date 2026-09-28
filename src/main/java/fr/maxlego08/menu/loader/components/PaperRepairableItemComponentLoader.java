@@ -34,8 +34,8 @@ public class PaperRepairableItemComponentLoader extends ItemComponentLoader {
     @Override
     public @Nullable ItemComponent load(@NotNull MenuItemStackContext context, @NotNull File file, @NotNull YamlConfiguration configuration, @NotNull String path, @Nullable ConfigurationSection componentSection) {
         if (componentSection == null) return null;
-        String string = componentSection.getString("items");
-        List<String> items = componentSection.getStringList("items");
+        List<String> items = componentSection.isList("items") ? componentSection.getStringList("items") : new ArrayList<>();
+        String string = componentSection.isList("items") ? null : componentSection.getString("items");
         List<TypedKey<ItemType>> itemKeys = new ArrayList<>();
         for (String item : items) {
             itemKeys.add(TypedKey.create(RegistryKey.ITEM, Key.key(item)));

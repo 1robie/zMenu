@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class PaperMapDecorationsComponent extends ItemComponent {
@@ -22,5 +23,14 @@ public class PaperMapDecorationsComponent extends ItemComponent {
     @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         Resolvable.applyResolvable(context, this.decorations, resolved -> itemStack.setData(DataComponentTypes.MAP_DECORATIONS, MapDecorations.mapDecorations(resolved)));
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (Map.Entry<String, PaperResolvableMapDecorationEntry> entry : this.decorations.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().serialize());
+        }
+        return map;
     }
 }

@@ -35,4 +35,9 @@ public class EnchantmentGlintOverrideComponent extends ItemComponent {
         itemStack.setItemMeta(itemMeta);
 
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.hasGlint.serialize();
+    }
 }

@@ -14,7 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.AbstractMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class StoredEnchantmentsComponent extends ItemComponent {
@@ -26,6 +28,18 @@ public class StoredEnchantmentsComponent extends ItemComponent {
 
     public @NotNull List<ResolvableEnchantmentEntry> getStoredEnchantments() {
         return this.storedEnchantments;
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (ResolvableEnchantmentEntry entry : this.storedEnchantments) {
+            if (!(entry.serialize() instanceof Map<?, ?> entryMap)) {
+                throw new UnsupportedOperationException("The stored enchantment " + entry + " cannot be serialized as a map");
+            }
+            entryMap.forEach((key, value) -> map.put(String.valueOf(key), value));
+        }
+        return map;
     }
 
     @Override

@@ -16,6 +16,9 @@ import org.bukkit.loot.Lootable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @SuppressWarnings("unused")
 public class ContainerLootComponent extends ItemComponent {
 
@@ -51,6 +54,16 @@ public class ContainerLootComponent extends ItemComponent {
         if (!apply && Configuration.enableDebug) {
             Logger.info("Failed to apply ContainerLootComponent to itemStack: " + itemStack.getType().name() + ". This item does not support block state meta.");
         }
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (this.resolvableLootTable != null) map.put("loot-table", this.resolvableLootTable.serialize());
+        if (this.seed.isDynamic() || !Long.valueOf(0L).equals(this.seed.getResolvedValue())) {
+            map.put("seed", this.seed.serialize());
+        }
+        return map;
     }
 
 }

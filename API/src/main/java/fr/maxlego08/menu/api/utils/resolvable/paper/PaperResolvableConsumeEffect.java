@@ -14,7 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public sealed interface PaperResolvableConsumeEffect extends Resolvable<ConsumeEffect> permits PaperResolvableConsumeEffect.PlaySound, PaperResolvableConsumeEffect.ApplyEffects, PaperResolvableConsumeEffect.TeleportRandomly, PaperResolvableConsumeEffect.ClearAllEffects, PaperResolvableConsumeEffect.RemoveEffects {
 
@@ -24,6 +26,17 @@ public sealed interface PaperResolvableConsumeEffect extends Resolvable<ConsumeE
             NamespacedKey resolvedSound = this.sound.resolve(context);
             if (resolvedSound == null) return null;
             return ConsumeEffect.playSoundConsumeEffect(resolvedSound);
+        }
+
+        /**
+         * Writes {@code type: play_sound} and {@code sound}.
+         */
+        @Override
+        public @NotNull Object serialize() {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("type", "play_sound");
+            map.put("sound", this.sound.serialize());
+            return map;
         }
     }
 
@@ -42,6 +55,18 @@ public sealed interface PaperResolvableConsumeEffect extends Resolvable<ConsumeE
             if (effects.isEmpty()) return null;
             return ConsumeEffect.applyStatusEffects(effects, resolveProb);
         }
+
+        /**
+         * Writes {@code type: apply_effects}, {@code potion-effects} as effect maps and, when set, {@code probability}.
+         */
+        @Override
+        public @NotNull Object serialize() {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("type", "apply_effects");
+            map.put("potion-effects", Resolvable.serializeList(this.potionEffects));
+            if (this.probability != null) map.put("probability", this.probability.serialize());
+            return map;
+        }
     }
 
     record TeleportRandomly(ResolvableFloat diameter) implements PaperResolvableConsumeEffect {
@@ -51,12 +76,33 @@ public sealed interface PaperResolvableConsumeEffect extends Resolvable<ConsumeE
             if (resolved == null) return null;
             return ConsumeEffect.teleportRandomlyEffect(resolved);
         }
+
+        /**
+         * Writes {@code type: teleport_randomly} and, when set, {@code diameter}.
+         */
+        @Override
+        public @NotNull Object serialize() {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("type", "teleport_randomly");
+            if (this.diameter != null) map.put("diameter", this.diameter.serialize());
+            return map;
+        }
     }
 
     record ClearAllEffects() implements PaperResolvableConsumeEffect {
         @Override
         public @NotNull ConsumeEffect resolve(@NotNull BuildContext context) {
             return ConsumeEffect.clearAllStatusEffects();
+        }
+
+        /**
+         * Writes {@code type: clear_all_effects}.
+         */
+        @Override
+        public @NotNull Object serialize() {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("type", "clear_all_effects");
+            return map;
         }
     }
 
@@ -66,6 +112,17 @@ public sealed interface PaperResolvableConsumeEffect extends Resolvable<ConsumeE
             RegistryKeySet<PotionEffectType> keys = this.effectTypes.resolve(context);
             if (keys == null) return null;
             return ConsumeEffect.removeEffects(keys);
+        }
+
+        /**
+         * Writes {@code type: remove_effects} and {@code effects} as a list of effect keys.
+         */
+        @Override
+        public @NotNull Object serialize() {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("type", "remove_effects");
+            map.put("effects", this.effectTypes.serialize());
+            return map;
         }
     }
 }

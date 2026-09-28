@@ -14,7 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PaperTooltipDisplayComponent extends ItemComponent {
     private final ResolvableBoolean hideTooltip;
@@ -33,5 +35,14 @@ public class PaperTooltipDisplayComponent extends ItemComponent {
         Resolvable.applyResolvable(context, this.hiddenComponents, HashSet::new, builder::hiddenComponents);
 
         itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, builder.build());
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        Object hideTooltip = this.hideTooltip.serialize();
+        if (!Boolean.FALSE.equals(hideTooltip)) map.put("hide-tooltip", hideTooltip);
+        if (!this.hiddenComponents.isEmpty()) map.put("hidden-components", Resolvable.serializeList(this.hiddenComponents));
+        return map;
     }
 }

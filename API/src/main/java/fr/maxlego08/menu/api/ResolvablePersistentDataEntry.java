@@ -1,6 +1,7 @@
 package fr.maxlego08.menu.api;
 
 import fr.maxlego08.menu.api.context.BuildContext;
+import fr.maxlego08.menu.api.utils.resolvable.ParsableResolvable;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableNamespacedKey;
 import fr.maxlego08.menu.api.utils.resolvable.lang.*;
 import org.bukkit.NamespacedKey;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class ResolvablePersistentDataEntry {
@@ -22,6 +24,34 @@ public abstract class ResolvablePersistentDataEntry {
 
     public abstract void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context);
 
+    /**
+     * @return the key as {@link #fromKeyValue} reads it
+     */
+    public @NotNull Object serializeKey() {
+        return Objects.requireNonNull(this.key.serialize());
+    }
+
+    /**
+     * Writes the value as {@link #fromValue} reads it back: a plain YAML value when YAML holds the
+     * type, otherwise the value followed by its {@code @type} suffix.
+     *
+     * @throws UnsupportedOperationException If this entry cannot be serialized.
+     */
+    public @NotNull Object serializeValue() {
+        throw new UnsupportedOperationException("The data entry " + this.getClass().getName() + " cannot be serialized");
+    }
+
+    protected static @NotNull Object typed(@NotNull ParsableResolvable<?> value, @NotNull String type) {
+        return value.serialize() + "@" + type;
+    }
+
+    /**
+     * The value as it is when fixed, since YAML reads it back with the same type; an expression needs its type.
+     */
+    protected static @NotNull Object plainOrTyped(@NotNull ParsableResolvable<?> value, @NotNull String type) {
+        return value.isDynamic() ? typed(value, type) : Objects.requireNonNull(value.serialize());
+    }
+
 
     public static final class StringEntry extends ResolvablePersistentDataEntry {
         private final ResolvableString value;
@@ -29,6 +59,12 @@ public abstract class ResolvablePersistentDataEntry {
         public StringEntry(@NotNull ResolvableNamespacedKey key, @NotNull ResolvableString value) {
             super(key);
             this.value = value;
+        }
+
+        @Override
+        public @NotNull Object serializeValue() {
+            String text = String.valueOf(this.value.serialize());
+            return text.contains("@") ? text + "@string" : text;
         }
 
         @Override
@@ -50,6 +86,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
+        public @NotNull Object serializeValue() {
+            return plainOrTyped(this.value, "int");
+        }
+
+        @Override
         public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Integer resolvedValue = this.value.resolve(context);
@@ -65,6 +106,11 @@ public abstract class ResolvablePersistentDataEntry {
         public LongEntry(@NotNull ResolvableNamespacedKey key, @NotNull ResolvableLong value) {
             super(key);
             this.value = value;
+        }
+
+        @Override
+        public @NotNull Object serializeValue() {
+            return typed(this.value, "long");
         }
 
         @Override
@@ -86,6 +132,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
+        public @NotNull Object serializeValue() {
+            return plainOrTyped(this.value, "double");
+        }
+
+        @Override
         public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Double resolvedValue = this.value.resolve(context);
@@ -101,6 +152,11 @@ public abstract class ResolvablePersistentDataEntry {
         public FloatEntry(@NotNull ResolvableNamespacedKey key, @NotNull ResolvableFloat value) {
             super(key);
             this.value = value;
+        }
+
+        @Override
+        public @NotNull Object serializeValue() {
+            return typed(this.value, "float");
         }
 
         @Override
@@ -122,6 +178,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
+        public @NotNull Object serializeValue() {
+            return typed(this.value, "byte");
+        }
+
+        @Override
         public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Byte resolvedValue = this.value.resolve(context);
@@ -137,6 +198,11 @@ public abstract class ResolvablePersistentDataEntry {
         public BooleanEntry(@NotNull ResolvableNamespacedKey key, @NotNull ResolvableBoolean value) {
             super(key);
             this.value = value;
+        }
+
+        @Override
+        public @NotNull Object serializeValue() {
+            return plainOrTyped(this.value, "boolean");
         }
 
         @Override
@@ -158,6 +224,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
+        public @NotNull Object serializeValue() {
+            return typed(this.value, "short");
+        }
+
+        @Override
         public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Short resolvedValue = this.value.resolve(context);
@@ -173,6 +244,11 @@ public abstract class ResolvablePersistentDataEntry {
         public ByteArrayEntry(@NotNull ResolvableNamespacedKey key, @NotNull ResolvableByteArray value) {
             super(key);
             this.value = value;
+        }
+
+        @Override
+        public @NotNull Object serializeValue() {
+            return typed(this.value, "byte_array");
         }
 
         @Override
@@ -194,6 +270,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
+        public @NotNull Object serializeValue() {
+            return typed(this.value, "int_array");
+        }
+
+        @Override
         public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             int[] resolvedValue = this.value.resolve(context);
@@ -209,6 +290,11 @@ public abstract class ResolvablePersistentDataEntry {
         public LongArrayEntry(@NotNull ResolvableNamespacedKey key, @NotNull ResolvableLongArray value) {
             super(key);
             this.value = value;
+        }
+
+        @Override
+        public @NotNull Object serializeValue() {
+            return typed(this.value, "long_array");
         }
 
         @Override

@@ -30,6 +30,11 @@ public class MaxDamageComponent extends ItemComponent {
     }
 
     @Override
+    public @Nullable Object serialize() {
+        return this.maxDamage.serialize();
+    }
+
+    @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         boolean apply = ItemUtil.editMeta(itemStack, Damageable.class, damageable -> {
             this.applyResolvable(context, damageable::setDamage, this.maxDamage);

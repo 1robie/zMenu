@@ -26,6 +26,11 @@ public class LoreComponent extends ItemComponent {
     }
 
     @Override
+    public @Nullable Object serialize() {
+        return Resolvable.serializeList(this.lore);
+    }
+
+    @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta != null) {

@@ -14,7 +14,10 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class ContainerComponent extends ItemComponent {
@@ -45,5 +48,16 @@ public class ContainerComponent extends ItemComponent {
         if (!apply && Configuration.enableDebug) {
             Logger.info("Failed to apply ContainerComponent to itemStack: " + itemStack.getType().name()+". This item does not support block state meta.");
         }
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        List<Map<String, Object>> items = new ArrayList<>(this.contents.size());
+        for (ResolvableContainerSlot slot : this.contents) {
+            Map<String, Object> item = new LinkedHashMap<>(slot.getItemStack().serializeToMap());
+            item.put("slot", slot.getSlot().serialize());
+            items.add(item);
+        }
+        return items;
     }
 }

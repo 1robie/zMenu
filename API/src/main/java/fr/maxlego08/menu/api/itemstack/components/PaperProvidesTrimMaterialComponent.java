@@ -22,4 +22,9 @@ public class PaperProvidesTrimMaterialComponent extends ItemComponent {
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         Resolvable.applyResolvable(context, this.trimMaterial, trimMaterial -> itemStack.setData(DataComponentTypes.PROVIDES_TRIM_MATERIAL, trimMaterial));
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.trimMaterial == null ? null : this.trimMaterial.serialize();
+    }
 }

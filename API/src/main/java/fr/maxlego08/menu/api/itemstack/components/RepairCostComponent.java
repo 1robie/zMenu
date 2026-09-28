@@ -29,6 +29,11 @@ public class RepairCostComponent extends ItemComponent {
     }
 
     @Override
+    public @Nullable Object serialize() {
+        return this.repairCost.serialize();
+    }
+
+    @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
 
         boolean apply = ItemUtil.editMeta(itemStack, Repairable.class, repairable -> {

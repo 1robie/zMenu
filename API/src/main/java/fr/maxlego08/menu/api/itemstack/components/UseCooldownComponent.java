@@ -11,6 +11,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+
 @SuppressWarnings("unused")
 public class UseCooldownComponent extends ItemComponent {
     private final ResolvableFloat cooldownSeconds;
@@ -27,6 +31,14 @@ public class UseCooldownComponent extends ItemComponent {
 
     public @Nullable ResolvableNamespacedKey getCooldownGroup() {
         return this.cooldownGroup;
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (!Objects.equals(this.cooldownSeconds.serialize(), 0f)) map.put("seconds", this.cooldownSeconds.serialize());
+        if (this.cooldownGroup != null) map.put("cooldown-group", this.cooldownGroup.serialize());
+        return map;
     }
 
     @Override

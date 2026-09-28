@@ -26,4 +26,9 @@ public final class MaxStackSizeComponent extends ItemComponent {
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         Resolvable.applyResolvable(context, this.maxStackSize, resolved -> itemStack.setData(DataComponentTypes.MAX_STACK_SIZE, resolved));
     }
+
+    @Override
+    public @Nullable Object serialize() {
+        return this.maxStackSize.serialize();
+    }
 }

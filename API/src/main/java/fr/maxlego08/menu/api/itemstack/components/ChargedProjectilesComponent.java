@@ -12,7 +12,9 @@ import org.bukkit.inventory.meta.CrossbowMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class ChargedProjectilesComponent extends ItemComponent {
@@ -36,5 +38,14 @@ public class ChargedProjectilesComponent extends ItemComponent {
         if (!apply && Configuration.enableDebug) {
             Logger.info("Failed to apply ChargedProjectilesComponent to itemStack: " + itemStack.getType().name()+". This item is probably not a crossbow.");
         }
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        List<Map<String, Object>> items = new ArrayList<>(this.projectiles.size());
+        for (MenuItemStack menuItemStack : this.projectiles) {
+            items.add(menuItemStack.serializeToMap());
+        }
+        return items;
     }
 }

@@ -31,6 +31,11 @@ public class OminousBottleAmplifierComponent extends ItemComponent {
     }
 
     @Override
+    public @Nullable Object serialize() {
+        return this.amplifier.serialize();
+    }
+
+    @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         boolean apply = ItemUtil.editMeta(itemStack, OminousBottleMeta.class, ominousBottleMeta -> {
             this.applyResolvable(context, ominousBottleMeta::setAmplifier, this.amplifier);

@@ -12,7 +12,9 @@ import org.bukkit.inventory.meta.BundleMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class BundleContentsComponent extends ItemComponent {
@@ -37,6 +39,15 @@ public class BundleContentsComponent extends ItemComponent {
         if (!apply && Configuration.enableDebug) {
             Logger.info("Failed to apply BundleContents to ItemStack of type " + itemStack.getType().name() + " check if it's a bundle.");
         }
+    }
+
+    @Override
+    public @Nullable Object serialize() {
+        List<Map<String, Object>> items = new ArrayList<>(this.contents.size());
+        for (MenuItemStack menuItemStack : this.contents) {
+            items.add(menuItemStack.serializeToMap());
+        }
+        return items;
     }
 
 }
