@@ -41,10 +41,10 @@ public final class BlockAttacksItemComponentLoader extends ItemComponentLoader {
         ResolvableFloat disableCooldownScale = this.asResolvableFloat(componentSection, "disable-cooldown-scale");
         ResolvableNamespacedKey blockSound = this.asResolvableKey(componentSection, "block-sound");
         ResolvableNamespacedKey disableSound = this.asResolvableKey(componentSection, "disable-sound");
-        TagKeyResolvable<DamageType> bypassedBy = fr.maxlego08.menu.api.utils.resolvable.paper.ResolvableRegistryKey.tagKeyOrNull(RegistryKey.DAMAGE_TYPE, componentSection.getString("bypassed_by"));
+        TagKeyResolvable<DamageType> bypassedBy = fr.maxlego08.menu.api.utils.resolvable.paper.ResolvableRegistryKey.tagKeyOrNull(RegistryKey.DAMAGE_TYPE, componentSection.getString("bypassed-by"));
 
         ResolvableItemDamageFunction itemDamage = null;
-        ConfigurationSection itemDamageSection = componentSection.getConfigurationSection("item_damage");
+        ConfigurationSection itemDamageSection = componentSection.getConfigurationSection("item-damage");
         if (itemDamageSection != null) {
             ResolvableFloat threshold = this.asResolvableFloat(itemDamageSection, "threshold");
             ResolvableFloat base = this.asResolvableFloat(itemDamageSection, "base");
@@ -52,13 +52,13 @@ public final class BlockAttacksItemComponentLoader extends ItemComponentLoader {
             itemDamage = new ResolvableItemDamageFunction(threshold, base, factor);
         }
 
-        List<Map<?, ?>> damageReductions = componentSection.getMapList("damage_reductions");
+        List<Map<?, ?>> damageReductions = componentSection.getMapList("damage-reductions");
         List<ResolvableDamageReduction> damageReductionList = null;
         for (Map<?, ?> damageReductionMap : damageReductions) {
             if (damageReductionMap == null) continue;
             ConfigurationSection damageReductionConfiguration = new YamlConfiguration();
             ConfigurationSection damageReduction = damageReductionConfiguration.createSection("damage_reduction", damageReductionMap);
-            ResolvableFloat horizontalBlockingAngle = this.asResolvableFloat(damageReduction, "horizontal_blocking_angle");
+            ResolvableFloat horizontalBlockingAngle = this.asResolvableFloat(damageReduction, "horizontal-blocking-angle");
             ResolvableFloat base = this.asResolvableFloat(damageReduction, "base");
             ResolvableFloat factor = this.asResolvableFloat(damageReduction, "factor");
             Resolvable<RegistryKeySet<DamageType>> type = ResolvableRegistryKeySet.typedKeySetOrNull(RegistryKey.DAMAGE_TYPE, damageReduction.get("type"));

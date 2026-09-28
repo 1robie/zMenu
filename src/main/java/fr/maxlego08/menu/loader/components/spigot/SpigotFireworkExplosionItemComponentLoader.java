@@ -62,16 +62,16 @@ public class SpigotFireworkExplosionItemComponentLoader extends AbstractFirework
         if (colorsObj != null) color = ResolvableColor.of(colorsObj);
 
         ResolvableColor fadeColor = null;
-        Object fadeColorsObj = data.get("fade_colors");
+        Object fadeColorsObj = data.get("fade-colors");
         if (fadeColorsObj != null) fadeColor = ResolvableColor.of(fadeColorsObj);
 
         ResolvableBoolean hasTrail = null;
-        Object hasTrailObj = data.get("has_trail");
+        Object hasTrailObj = data.get("has-trail");
         if (hasTrailObj instanceof Boolean bool) hasTrail = ResolvableBoolean.of(bool);
         else if (hasTrailObj instanceof String expr) hasTrail = ResolvableBoolean.of(expr);
 
         ResolvableBoolean hasTwinkle = null;
-        Object hasTwinkleObj = data.get("has_twinkle");
+        Object hasTwinkleObj = data.get("has-twinkle");
         if (hasTwinkleObj instanceof Boolean bool) hasTwinkle = ResolvableBoolean.of(bool);
         else if (hasTwinkleObj instanceof String expr) hasTwinkle = ResolvableBoolean.of(expr);
 

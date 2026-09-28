@@ -43,7 +43,7 @@ public class DiscordComponentAction extends ActionHelper {
     protected void serializeProperties(@NonNull Map<String, Object> map) {
         map.put("type", "discord component");
         map.put("webhook", this.configuration.webhookUrl());
-        if (this.configuration.avatarUrl() != null) map.put("avatar_url", this.configuration.avatarUrl());
+        if (this.configuration.avatarUrl() != null) map.put("avatar-url", this.configuration.avatarUrl());
         if (this.configuration.username() != null) map.put("username", this.configuration.username());
         if (this.configuration.json() != null) map.put("component", this.configuration.json());
     }

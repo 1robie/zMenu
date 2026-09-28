@@ -33,8 +33,8 @@ public class PaperTooltipDisplayItemComponentLoader extends ItemComponentLoader 
     @Override
     public @Nullable ItemComponent load(@NotNull MenuItemStackContext context, @NotNull File file, @NotNull YamlConfiguration configuration, @NotNull String path, @Nullable ConfigurationSection componentSection) {
         if (componentSection == null) return null;
-        ResolvableBoolean hideTooltip = ResolvableBoolean.auto(componentSection.getString("hide_tooltip"), false);
-        List<ResolvableRegistryEntry<DataComponentType>> hiddenComponentEntries = componentSection.getStringList("hidden_components").stream()
+        ResolvableBoolean hideTooltip = ResolvableBoolean.auto(componentSection.getString("hide-tooltip"), false);
+        List<ResolvableRegistryEntry<DataComponentType>> hiddenComponentEntries = componentSection.getStringList("hidden-components").stream()
                 .map(component -> ResolvableRegistry.autoOrNull(component, RegistryKey.DATA_COMPONENT_TYPE))
                 .filter(Objects::nonNull)
                 .toList();

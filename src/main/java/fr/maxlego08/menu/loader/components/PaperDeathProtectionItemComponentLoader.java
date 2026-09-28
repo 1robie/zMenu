@@ -28,7 +28,7 @@ public class PaperDeathProtectionItemComponentLoader extends AbstractEffectItemC
     @Override
     public @Nullable ItemComponent load(@NotNull MenuItemStackContext context, @NotNull File file, @NotNull YamlConfiguration configuration, @NotNull String path, @Nullable ConfigurationSection componentSection) {
         if (componentSection == null) return null;
-        List<PaperResolvableConsumeEffect> resolvablePotionEffects = this.parseEffects(componentSection.getMapList("death_effects"));
+        List<PaperResolvableConsumeEffect> resolvablePotionEffects = this.parseEffects(componentSection.getMapList("death-effects"));
         return resolvablePotionEffects.isEmpty() ? null : new PaperDeathProtectionComponent(new PaperResolvableDeathProtection(resolvablePotionEffects));
     }
 }

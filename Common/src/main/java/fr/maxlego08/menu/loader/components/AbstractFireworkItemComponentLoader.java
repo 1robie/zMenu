@@ -34,20 +34,20 @@ public abstract class AbstractFireworkItemComponentLoader extends AbstractColorI
                 builder.withColor(color);
             }
         }
-        Object fadeColorsObj = data.get("fade_colors");
+        Object fadeColorsObj = data.get("fade-colors");
         if (fadeColorsObj != null) {
             Color fadeColor = ColorUtils.parse(fadeColorsObj);
             if (fadeColor != null) {
                 builder.withFade(fadeColor);
             }
         }
-        Object hasTrailObj = data.get("has_trail");
+        Object hasTrailObj = data.get("has-trail");
         if (hasTrailObj != null) {
             boolean hasTrail = (boolean) hasTrailObj;
             builder.trail(hasTrail);
         }
 
-        Object hasTwinkleObj = data.get("has_twinkle");
+        Object hasTwinkleObj = data.get("has-twinkle");
         if (hasTwinkleObj != null) {
             boolean hasTwinkle = (boolean) hasTwinkleObj;
             builder.flicker(hasTwinkle);

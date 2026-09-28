@@ -33,7 +33,7 @@ public class SpigotAttributeModifiersItemComponentLoader extends ItemComponentLo
     @Override
     public @Nullable ItemComponent load(@NotNull MenuItemStackContext context, @NotNull File file, @NotNull YamlConfiguration configuration, @NotNull String path, @Nullable ConfigurationSection componentSection) {
         if (componentSection == null) return null;
-        String mergeStrategyStr = componentSection.getString("attribute-merge-strategy", "");
+        String mergeStrategyStr = componentSection.getString("attribute-merge-strategy");
         ResolvableEnum<AttributeMergeStrategy> attributeMergeStrategyResolvable = ResolvableEnum.autoOrNull(AttributeMergeStrategy.class, mergeStrategyStr);
         List<Map<?, ?>> mapList = componentSection.getMapList("modifiers");
         List<ResolvableAttributeWrapper> resolvableWrappers = new ArrayList<>();
