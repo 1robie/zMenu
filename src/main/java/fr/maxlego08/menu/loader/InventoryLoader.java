@@ -9,7 +9,6 @@ import fr.maxlego08.menu.api.configuration.Configuration;
 import fr.maxlego08.menu.api.exceptions.InventoryException;
 import fr.maxlego08.menu.api.exceptions.InventorySizeException;
 import fr.maxlego08.menu.api.exceptions.InventoryTypeException;
-import fr.maxlego08.menu.api.inventory.ContainerInventory;
 import fr.maxlego08.menu.api.itemstack.ItemStackSimilar;
 import fr.maxlego08.menu.api.pattern.ActionPattern;
 import fr.maxlego08.menu.api.pattern.Pattern;
@@ -338,19 +337,5 @@ public class InventoryLoader extends ZUtils implements Loader<Inventory> {
                 inventory.setTitleAnimation(titleAnimation);
             }
         }
-    }
-
-    @Override
-    public void save(Inventory inventory, @NonNull YamlConfiguration configuration, @NonNull String path, File file, Object... objects) {
-        MenuItemStackLoader itemStackLoader = new MenuItemStackLoader(this.plugin.getInventoryManager());
-
-        configuration.set("name", inventory.getName());
-        configuration.set("size", inventory.size());
-
-        if (inventory instanceof ContainerInventory containerInventory && containerInventory.getFillItemStack() != null) {
-            itemStackLoader.save(containerInventory.getFillItemStack(), configuration, "fill-item.", file);
-        }
-
-        // TODO: FINISH THE SAVE METHOD
     }
 }

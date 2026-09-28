@@ -18,28 +18,11 @@ public class OpenBookAction extends ActionHelper {
     private final String title;
     private final String author;
     private final List<String> lines;
-    private final Map<?, List<String>> pages;
 
     public OpenBookAction(String title, String author, List<String> lines) {
-        this(title, author, lines, toPages(lines));
-    }
-
-    /**
-     * @param pages the raw "lines" section as read from the configuration (page key to its lines), kept for serialization.
-     */
-    public OpenBookAction(String title, String author, List<String> lines, Map<?, List<String>> pages) {
         this.title = title;
         this.author = author;
         this.lines = lines;
-        this.pages = pages;
-    }
-
-    private static Map<?, List<String>> toPages(List<String> lines) {
-        Map<Integer, List<String>> pages = new LinkedHashMap<>();
-        for (int i = 0; i < lines.size(); i++) {
-            pages.put(i + 1, Arrays.asList(lines.get(i).split(Pattern.quote("<newline>"), -1)));
-        }
-        return pages;
     }
 
     @Override
@@ -52,6 +35,12 @@ public class OpenBookAction extends ActionHelper {
         map.put("type", "book");
         map.put("title", this.title);
         map.put("author", this.author);
-        if (!this.pages.isEmpty()) map.put("lines", this.pages);
+        if (this.lines.isEmpty()) return;
+
+        Map<Integer, List<String>> pages = new LinkedHashMap<>();
+        for (int index = 0; index < this.lines.size(); index++) {
+            pages.put(index + 1, Arrays.asList(this.lines.get(index).split(Pattern.quote("<newline>"), -1)));
+        }
+        map.put("lines", pages);
     }
 }

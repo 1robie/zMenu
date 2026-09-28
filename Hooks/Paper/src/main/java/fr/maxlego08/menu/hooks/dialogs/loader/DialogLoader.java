@@ -174,11 +174,6 @@ public class DialogLoader implements Loader<AbstractDialogInventory> {
         return buttons;
     }
 
-    @Override
-    public void save(AbstractDialogInventory object, @NonNull YamlConfiguration configuration, @NonNull String path, File file, Object... objects) {
-        //TODO: Implement save logic if needed
-    }
-
     protected Requirement loadRequirement(YamlConfiguration configuration, String path, File file) throws InventoryException {
         return this.menuPlugin.getButtonManager().loadRequirement(configuration, path, file);
     }
