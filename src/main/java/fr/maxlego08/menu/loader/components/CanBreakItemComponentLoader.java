@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AutoComponentLoader
-@SinceVersion("1.20.5")
+@SinceVersion("1.21.3")
 public final class CanBreakItemComponentLoader extends ItemComponentLoader {
 
     public CanBreakItemComponentLoader() {

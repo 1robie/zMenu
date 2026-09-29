@@ -2,6 +2,7 @@ package fr.maxlego08.menu.loader.components;
 
 import fr.maxlego08.menu.api.annotations.AutoComponentLoader;
 import fr.maxlego08.menu.api.annotations.SinceVersion;
+import fr.maxlego08.menu.api.annotations.UntilVersion;
 import fr.maxlego08.menu.api.context.MenuItemStackContext;
 import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.itemstack.components.SwingAnimationComponent;
@@ -19,6 +20,7 @@ import java.io.File;
 
 @AutoComponentLoader
 @SinceVersion("1.21.11")
+@UntilVersion("26.2")
 public final class SwingAnimationItemComponentLoader extends ItemComponentLoader {
 
     public SwingAnimationItemComponentLoader() {

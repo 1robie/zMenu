@@ -1,18 +1,15 @@
 package fr.maxlego08.menu.api.itemstack.components;
 
-import fr.maxlego08.menu.api.configuration.Configuration;
 import fr.maxlego08.menu.api.context.BuildContext;
 import fr.maxlego08.menu.api.itemstack.ItemComponent;
-import fr.maxlego08.menu.api.utils.ItemUtil;
 import fr.maxlego08.menu.api.utils.resolvable.Resolvable;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableEnum;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableLong;
-import fr.maxlego08.menu.zcore.logger.Logger;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.SeededContainerLoot;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.loot.LootTables;
-import org.bukkit.loot.Lootable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,20 +37,13 @@ public class ContainerLootComponent extends ItemComponent {
 
     @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
-        boolean apply = ItemUtil.editMeta(itemStack, BlockStateMeta.class, blockStateMeta -> {
-            if (blockStateMeta instanceof Lootable lootableMeta) {
+        LootTables lootTable = Resolvable.resolve(context, this.resolvableLootTable);
+        if (lootTable == null) return;
 
-                Resolvable.applyResolvable(context, this.resolvableLootTable, lootTables -> {
-                   lootableMeta.setLootTable(lootTables.getLootTable());
-                });
+        SeededContainerLoot.Builder containerLoot = SeededContainerLoot.seededContainerLoot(lootTable.getKey());
+        this.applyResolvable(context, containerLoot::seed, this.seed);
 
-                Resolvable.applyResolvable(context, this.seed, lootableMeta::setSeed);
-
-            }
-        });
-        if (!apply && Configuration.enableDebug) {
-            Logger.info("Failed to apply ContainerLootComponent to itemStack: " + itemStack.getType().name() + ". This item does not support block state meta.");
-        }
+        itemStack.setData(DataComponentTypes.CONTAINER_LOOT, containerLoot.build());
     }
 
     @Override

@@ -5,9 +5,10 @@ import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.utils.resolvable.Resolvable;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableNamespacedKey;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.UseCooldown;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,16 +44,13 @@ public class UseCooldownComponent extends ItemComponent {
 
     @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta != null) {
+        Float seconds = this.cooldownSeconds.resolve(context);
+        if (seconds == null) return;
 
-            org.bukkit.inventory.meta.components.UseCooldownComponent useCooldown = itemMeta.getUseCooldown();
+        UseCooldown.Builder useCooldown = UseCooldown.useCooldown(seconds);
 
-            Resolvable.applyResolvable(context, this.cooldownSeconds, useCooldown::setCooldownSeconds);
+        Resolvable.applyResolvable(context, this.cooldownGroup, useCooldown::cooldownGroup);
 
-            Resolvable.applyResolvable(context, this.cooldownGroup, useCooldown::setCooldownGroup);
-
-            itemStack.setItemMeta(itemMeta);
-        }
+        itemStack.setData(DataComponentTypes.USE_COOLDOWN, useCooldown.build());
     }
 }

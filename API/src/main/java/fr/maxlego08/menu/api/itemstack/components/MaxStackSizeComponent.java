@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class MaxStackSizeComponent extends ItemComponent {
+public class MaxStackSizeComponent extends ItemComponent {
     private final ResolvableInt maxStackSize;
 
     public MaxStackSizeComponent(ResolvableInt maxStackSize) {

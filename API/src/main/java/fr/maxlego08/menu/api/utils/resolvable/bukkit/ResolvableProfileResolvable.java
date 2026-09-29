@@ -1,5 +1,6 @@
 package fr.maxlego08.menu.api.utils.resolvable.bukkit;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import fr.maxlego08.menu.api.context.BuildContext;
 import fr.maxlego08.menu.api.utils.resolvable.Resolvable;
@@ -7,6 +8,7 @@ import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableEnum;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableString;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableUUID;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
+import org.bukkit.Bukkit;
 import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,6 +74,23 @@ public class ResolvableProfileResolvable implements Resolvable<ResolvableProfile
         }
 
         return builder.build();
+    }
+
+    public @Nullable PlayerProfile resolvePlayerProfile(@NotNull BuildContext context) {
+        String resolvedName = Resolvable.resolve(context, this.name);
+        UUID resolvedUuid = Resolvable.resolve(context, this.uuid);
+        if (resolvedName == null && resolvedUuid == null) return null;
+
+        PlayerProfile profile = Bukkit.createProfile(resolvedUuid, resolvedName);
+        if (this.properties != null) {
+            for (ProfilePropertyEntry entry : this.properties) {
+                ProfileProperty prop = entry.resolve(context);
+                if (prop != null) {
+                    profile.setProperty(prop);
+                }
+            }
+        }
+        return profile;
     }
 
     private @Nullable ResolvableProfile.SkinPatch resolveSkinPatch(@NotNull BuildContext context) {

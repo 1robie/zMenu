@@ -5,7 +5,7 @@ import fr.maxlego08.menu.api.utils.resolvable.ParsableResolvable;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableNamespacedKey;
 import fr.maxlego08.menu.api.utils.resolvable.lang.*;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +22,7 @@ public abstract class ResolvablePersistentDataEntry {
         this.key = key;
     }
 
-    public abstract void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context);
+    public abstract void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context);
 
     /**
      * @return the key as {@link #fromKeyValue} reads it
@@ -68,11 +68,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             String resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.STRING, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.STRING, resolvedValue);
             }
         }
     }
@@ -91,11 +91,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Integer resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.INTEGER, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.INTEGER, resolvedValue);
             }
         }
     }
@@ -114,11 +114,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Long resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.LONG, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.LONG, resolvedValue);
             }
         }
     }
@@ -137,11 +137,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Double resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.DOUBLE, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.DOUBLE, resolvedValue);
             }
         }
     }
@@ -160,11 +160,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Float resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.FLOAT, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.FLOAT, resolvedValue);
             }
         }
     }
@@ -183,11 +183,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Byte resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.BYTE, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.BYTE, resolvedValue);
             }
         }
     }
@@ -206,11 +206,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Boolean resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.BOOLEAN, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.BOOLEAN, resolvedValue);
             }
         }
     }
@@ -229,11 +229,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             Short resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.SHORT, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.SHORT, resolvedValue);
             }
         }
     }
@@ -252,11 +252,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             byte[] resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.BYTE_ARRAY, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.BYTE_ARRAY, resolvedValue);
             }
         }
     }
@@ -275,11 +275,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             int[] resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.INTEGER_ARRAY, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.INTEGER_ARRAY, resolvedValue);
             }
         }
     }
@@ -298,11 +298,11 @@ public abstract class ResolvablePersistentDataEntry {
         }
 
         @Override
-        public void applyTo(@NotNull ItemMeta itemMeta, @NotNull BuildContext context) {
+        public void applyTo(@NotNull PersistentDataContainer container, @NotNull BuildContext context) {
             NamespacedKey resolvedKey = this.key.resolve(context);
             long[] resolvedValue = this.value.resolve(context);
             if (resolvedKey != null && resolvedValue != null) {
-                itemMeta.getPersistentDataContainer().set(resolvedKey, PersistentDataType.LONG_ARRAY, resolvedValue);
+                container.set(resolvedKey, PersistentDataType.LONG_ARRAY, resolvedValue);
             }
         }
     }
