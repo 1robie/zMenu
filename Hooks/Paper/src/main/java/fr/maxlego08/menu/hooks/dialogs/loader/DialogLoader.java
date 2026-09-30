@@ -78,14 +78,14 @@ public class DialogLoader implements Loader<AbstractDialogInventory> {
         }
         if (configuration.isConfigurationSection("inventory-replacement")){
             String replacementName = configuration.getString("inventory-replacement.name", "");
-            String replacementPlugin = configuration.getString("inventory-replacement.plugin", "zMenu");
+            String replacementPlugin = configuration.getString("inventory-replacement.plugin", InventoryReplacement.DEFAULT_PLUGIN);
             List<Integer> replacementPages = configuration.getIntegerList("inventory-replacement.pages");
             InventoryReplacement inventoryReplacement = new InventoryReplacement(replacementName, replacementPlugin, replacementPages);
             dialogInventory.setInventoryReplacement(inventoryReplacement);
         }
         if (configuration.isConfigurationSection("fallback-inventory")) {
             String fallbackName = configuration.getString("fallback-inventory.name", "");
-            String fallbackPlugin = configuration.getString("fallback-inventory.plugin", "zMenu");
+            String fallbackPlugin = configuration.getString("fallback-inventory.plugin", InventoryReplacement.DEFAULT_PLUGIN);
             int fallbackPage = configuration.getInt("fallback-inventory.page", 1);
             DialogFallback dialogFallback = new DialogFallback(fallbackName, fallbackPlugin, fallbackPage);
             if (!dialogFallback.isValid()) {

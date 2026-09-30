@@ -830,23 +830,21 @@ public class ZInventoryManager extends ZUtils implements InventoryManager {
             }
         }
 
-        Loader<MenuItemStack> loader = new MenuItemStackLoader(this);
         ZMenuItemStack menuItemStack = ZMenuItemStack.fromItemStack(this, itemStack);
         if (type.equalsIgnoreCase("yml")) {
-            loader.save(menuItemStack, configuration, "items." + name + ".", file);
+            menuItemStack.serialize(configuration.createSection("items." + name));
         } else if (type.equalsIgnoreCase("base64")) {
-
             String base64 = ItemStackUtils.serializeItemStack(itemStack);
             configuration.set("items." + name + ".material", "base64:" + base64);
-            try {
-                configuration.save(file);
-            } catch (IOException exception) {
-                Logger.error(exception);
-            }
-
         } else {
             message(this.plugin, sender, Message.SAVE_ERROR_TYPE, "%name%", name);
             return;
+        }
+
+        try {
+            configuration.save(file);
+        } catch (IOException exception) {
+            Logger.error(exception);
         }
 
         message(this.plugin, sender, Message.SAVE_SUCCESS, "%name%", name);
