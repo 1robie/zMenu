@@ -51,7 +51,7 @@ public final class ResolvableLodestoneLocation implements Resolvable<Location> {
     @Override
     public @NotNull Object serialize() {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("post", Resolvable.serializeList(Arrays.asList(this.x, this.y, this.z)));
+        map.put("pos", Resolvable.serializeList(Arrays.asList(this.x, this.y, this.z)));
         map.put("dimension", this.world.serialize());
         return map;
     }

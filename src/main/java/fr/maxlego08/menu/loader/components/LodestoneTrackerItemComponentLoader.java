@@ -42,7 +42,7 @@ public class LodestoneTrackerItemComponentLoader extends ItemComponentLoader {
     private @Nullable ResolvableLodestoneLocation parseTarget(@Nullable ConfigurationSection targetSection) {
         if (targetSection == null) return null;
 
-        List<?> postList = targetSection.getList("post");
+        List<?> postList = targetSection.getList("pos");
         if (postList == null || postList.size() < 3) return null;
 
         ResolvableInt x = toResolvableInt(postList.get(0), 0);
