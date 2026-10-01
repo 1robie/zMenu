@@ -11,8 +11,12 @@ import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableDyeColor;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import fr.maxlego08.menu.api.utils.resolvable.paper.ResolvableComponent;
 import fr.maxlego08.menu.zcore.logger.Logger;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.SignText;
+import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,5 +59,22 @@ public abstract class SignTextItemComponentLoader extends ItemComponentLoader {
         ResolvableBoolean hasGlowingText = this.asResolvableBoolean(componentSection, "has-glowing-text");
 
         return new SignTextComponent(this.side, messages, color, hasGlowingText);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        if (!(this.metaUpdater instanceof PaperMetaUpdater paperMetaUpdater)) return null;
+
+        SignText signText = itemStack.getData(this.side == SignTextComponent.Side.FRONT ? DataComponentTypes.SIGN_TEXT_FRONT : DataComponentTypes.SIGN_TEXT_BACK);
+        if (signText == null || signText.lines().size() > SignTextComponent.LINES) return null;
+
+        List<ResolvableComponent> messages = new ArrayList<>(signText.lines().size());
+        for (Component line : signText.lines()) {
+            ResolvableComponent message = toResolvableComponent(line, paperMetaUpdater);
+            if (message == null) return null;
+            messages.add(message);
+        }
+
+        return new SignTextComponent(this.side, messages, ResolvableDyeColor.of(signText.color()), ResolvableBoolean.of(signText.hasGlowingText()));
     }
 }

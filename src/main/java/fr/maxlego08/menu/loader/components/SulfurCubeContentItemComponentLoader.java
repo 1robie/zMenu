@@ -9,6 +9,7 @@ import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.itemstack.components.SulfurCubeContentComponent;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,15 @@ public class SulfurCubeContentItemComponentLoader extends AbstractMenuItemStackL
         if (componentSection == null) return null;
         Map<String, Object> values = componentSection.getValues(true);
         MenuItemStack menuItemStack = this.loadItemStack(values, file);
+        return menuItemStack == null ? null : new SulfurCubeContentComponent(menuItemStack);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        ItemStack absorbedItem = SulfurCubeContentComponent.getAbsorbedItem(itemStack);
+        if (absorbedItem == null || absorbedItem.isEmpty()) return null;
+
+        MenuItemStack menuItemStack = this.convertItemStack(absorbedItem);
         return menuItemStack == null ? null : new SulfurCubeContentComponent(menuItemStack);
     }
 }

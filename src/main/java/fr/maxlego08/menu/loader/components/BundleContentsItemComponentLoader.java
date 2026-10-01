@@ -8,8 +8,12 @@ import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.itemstack.components.BundleContentsComponent;
 import fr.maxlego08.menu.api.itemstack.components.legacy.LegacyBundleContentsComponent;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.BundleContents;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BundleMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,5 +38,22 @@ public class BundleContentsItemComponentLoader extends AbstractMenuItemStackList
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new BundleContentsComponent(contents)
                 : new LegacyBundleContentsComponent(contents);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        BundleContents bundleContents = itemStack.getData(DataComponentTypes.BUNDLE_CONTENTS);
+        if (bundleContents == null || bundleContents.contents().isEmpty()) return null;
+
+        List<MenuItemStack> contents = this.convertItemStackList(bundleContents.contents());
+        return contents == null ? null : new BundleContentsComponent(contents);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof BundleMeta bundleMeta) || !bundleMeta.hasItems()) return null;
+
+        List<MenuItemStack> contents = this.convertItemStackListFromItemMeta(bundleMeta.getItems());
+        return contents == null ? null : new LegacyBundleContentsComponent(contents);
     }
 }

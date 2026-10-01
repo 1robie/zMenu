@@ -8,8 +8,12 @@ import fr.maxlego08.menu.api.itemstack.components.legacy.LegacyOminousBottleAmpl
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.OminousBottleAmplifier;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.OminousBottleMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,5 +34,17 @@ public class OminousBottleAmplifierItemComponentLoader extends ItemComponentLoad
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new OminousBottleAmplifierComponent(amplifier)
                 : new LegacyOminousBottleAmplifierComponent(amplifier);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        OminousBottleAmplifier amplifier = itemStack.getData(DataComponentTypes.OMINOUS_BOTTLE_AMPLIFIER);
+        return amplifier == null ? null : new OminousBottleAmplifierComponent(ResolvableInt.of(amplifier.amplifier()));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof OminousBottleMeta ominousBottleMeta) || !ominousBottleMeta.hasAmplifier()) return null;
+        return new LegacyOminousBottleAmplifierComponent(ResolvableInt.of(ominousBottleMeta.getAmplifier()));
     }
 }

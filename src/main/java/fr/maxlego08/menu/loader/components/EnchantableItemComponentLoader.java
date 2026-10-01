@@ -7,8 +7,11 @@ import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.itemstack.components.EnchantableComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Enchantable;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,5 +35,11 @@ public class EnchantableItemComponentLoader extends ItemComponentLoader {
             if (resolved == null || resolved < 0) return null;
         }
         return new EnchantableComponent(value);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        Enchantable enchantable = itemStack.getData(DataComponentTypes.ENCHANTABLE);
+        return enchantable == null ? null : new EnchantableComponent(ResolvableInt.of(enchantable.value()));
     }
 }

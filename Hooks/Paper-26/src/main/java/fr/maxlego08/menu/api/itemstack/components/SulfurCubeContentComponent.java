@@ -22,6 +22,11 @@ public class SulfurCubeContentComponent extends ItemComponent {
         return this.menuItemStack;
     }
 
+    public static @Nullable ItemStack getAbsorbedItem(@NotNull ItemStack itemStack) {
+        SulfurCubeContent content = itemStack.getData(DataComponentTypes.SULFUR_CUBE_CONTENT);
+        return content == null ? null : content.absorbedItem();
+    }
+
     @Override
     public void apply(@NotNull BuildContext context, @NotNull ItemStack itemStack, @Nullable Player player) {
         SulfurCubeContent content = SulfurCubeContent.sulfurCubeContent(this.menuItemStack.build(player));

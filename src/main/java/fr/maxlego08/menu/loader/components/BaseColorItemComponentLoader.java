@@ -9,9 +9,14 @@ import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.Resolvable;
 import fr.maxlego08.menu.api.utils.resolvable.SimpleResolvable;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.DyeColor;
+import org.bukkit.block.Banner;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,5 +52,22 @@ public class BaseColorItemComponentLoader extends ItemComponentLoader {
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new BaseColorComponent(dyeColorResolvable)
                 : new LegacyBaseColorComponent(dyeColorResolvable);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        DyeColor baseColor = itemStack.getData(DataComponentTypes.BASE_COLOR);
+        return baseColor == null ? null : new BaseColorComponent(SimpleResolvable.of(baseColor, DyeColor::valueOf));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        DyeColor baseColor = readBaseColor(itemStack.getItemMeta());
+        return baseColor == null ? null : new LegacyBaseColorComponent(SimpleResolvable.of(baseColor, DyeColor::valueOf));
+    }
+
+    private static @Nullable DyeColor readBaseColor(@Nullable ItemMeta itemMeta) {
+        if (!(itemMeta instanceof BlockStateMeta blockStateMeta) || !blockStateMeta.hasBlockState()) return null;
+        return blockStateMeta.getBlockState() instanceof Banner banner ? banner.getBaseColor() : null;
     }
 }

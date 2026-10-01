@@ -6,12 +6,16 @@ import fr.maxlego08.menu.api.context.MenuItemStackContext;
 import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.itemstack.components.ProvidesBannerPatternsComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
+import io.papermc.paper.datacomponent.DataComponentType;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.tag.Tag;
 import io.papermc.paper.registry.tag.TagKey;
 import net.kyori.adventure.key.Key;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,5 +37,21 @@ public class ProvidesBannerPatternsItemComponentLoader extends ItemComponentLoad
         Key key = Key.key(value);
         TagKey<PatternType> patternTypeTagKey = RegistryKey.BANNER_PATTERN.tagKey(key);
         return new ProvidesBannerPatternsComponent(patternTypeTagKey);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        DataComponentType.Valued<Object> type = (DataComponentType.Valued<Object>) (DataComponentType.Valued<?>) DataComponentTypes.PROVIDES_BANNER_PATTERNS;
+        Object value = itemStack.getData(type);
+        TagKey<PatternType> tagKey;
+        if (value instanceof TagKey<?> key) {
+            tagKey = (TagKey<PatternType>) key;
+        } else if (value instanceof Tag<?> tag) {
+            tagKey = (TagKey<PatternType>) tag.tagKey();
+        } else {
+            return null;
+        }
+        return new ProvidesBannerPatternsComponent(RegistryKey.BANNER_PATTERN.tagKey(tagKey.key()));
     }
 }

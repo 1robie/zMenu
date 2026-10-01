@@ -8,9 +8,12 @@ import fr.maxlego08.menu.api.itemstack.components.legacy.LegacyRarityComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableEnum;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemRarity;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,5 +35,18 @@ public class RarityItemComponentLoader extends ItemComponentLoader {
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new RarityComponent(rarityResolvable)
                 : new LegacyRarityComponent(rarityResolvable);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        ItemRarity rarity = itemStack.getData(DataComponentTypes.RARITY);
+        return rarity == null ? null : new RarityComponent(ResolvableEnum.of(ItemRarity.class, rarity));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null || !itemMeta.hasRarity()) return null;
+        return new LegacyRarityComponent(ResolvableEnum.of(ItemRarity.class, itemMeta.getRarity()));
     }
 }

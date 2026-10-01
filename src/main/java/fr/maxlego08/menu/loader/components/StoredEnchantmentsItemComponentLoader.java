@@ -10,8 +10,12 @@ import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableEnchantment;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableEnchantmentEntry;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ItemEnchantments;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,5 +60,22 @@ public class StoredEnchantmentsItemComponentLoader extends ItemComponentLoader {
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new StoredEnchantmentsComponent(entries)
                 : new LegacyStoredEnchantmentsComponent(entries);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        ItemEnchantments enchantments = itemStack.getData(DataComponentTypes.STORED_ENCHANTMENTS);
+        if (enchantments == null) return null;
+        List<ResolvableEnchantmentEntry> entries = new ArrayList<>();
+        enchantments.enchantments().forEach((enchantment, level) -> entries.add(new ResolvableEnchantmentEntry(ResolvableEnchantment.of(enchantment), ResolvableInt.of(level))));
+        return new StoredEnchantmentsComponent(entries);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof EnchantmentStorageMeta storageMeta) || !storageMeta.hasStoredEnchants()) return null;
+        List<ResolvableEnchantmentEntry> entries = new ArrayList<>();
+        storageMeta.getStoredEnchants().forEach((enchantment, level) -> entries.add(new ResolvableEnchantmentEntry(ResolvableEnchantment.of(enchantment), ResolvableInt.of(level))));
+        return new LegacyStoredEnchantmentsComponent(entries);
     }
 }

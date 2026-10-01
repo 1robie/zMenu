@@ -10,9 +10,11 @@ import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableEnum;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
 import fr.maxlego08.menu.api.utils.resolvable.paper.ResolvableSwingAnimation;
 import fr.maxlego08.menu.zcore.logger.Logger;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.SwingAnimation;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,5 +57,12 @@ public final class AttackAnimationItemComponentLoader extends ItemComponentLoade
         ResolvableInt duration = ResolvableInt.autoOrNull(componentSection.getString("duration"));
 
         return new AttackAnimationComponent(new ResolvableSwingAnimation(type, duration));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        SwingAnimation animation = itemStack.getData(DataComponentTypes.ATTACK_ANIMATION);
+        if (animation == null) return null;
+        return new AttackAnimationComponent(new ResolvableSwingAnimation(ResolvableEnum.of(SwingAnimation.Animation.class, animation.type()), ResolvableInt.of(animation.duration())));
     }
 }

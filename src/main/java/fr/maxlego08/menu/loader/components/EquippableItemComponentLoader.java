@@ -10,8 +10,13 @@ import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.*;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Equippable;
+import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,6 +85,33 @@ public class EquippableItemComponentLoader extends ItemComponentLoader {
                         cameraOverlay, canBeSheared, shearingSound,
                         allowedEntities, allowedEntityTags
                 );
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        if (!MinecraftVersion.isServerAtLeast("1.21.6")) return null;
+        Equippable equippable = itemStack.getData(DataComponentTypes.EQUIPPABLE);
+        if (equippable == null || equippable.allowedEntities() != null) return null;
+        return new EquippableComponent(
+                ResolvableEquipmentSlot.of(equippable.slot()),
+                this.toResolvableKey(equippable.equipSound()),
+                this.toResolvableKey(equippable.assetId()),
+                ResolvableBoolean.of(equippable.dispensable()),
+                ResolvableBoolean.of(equippable.swappable()),
+                ResolvableBoolean.of(equippable.damageOnHurt()),
+                ResolvableBoolean.of(equippable.equipOnInteract()),
+                this.toResolvableKey(equippable.cameraOverlay()),
+                ResolvableBoolean.of(equippable.canBeSheared()),
+                this.toResolvableKey(equippable.shearSound()),
+                null,
+                null
+        );
+    }
+
+    private @Nullable ResolvableNamespacedKey toResolvableKey(@Nullable Key key) {
+        if (key == null) return null;
+        NamespacedKey namespacedKey = NamespacedKey.fromString(key.asString());
+        return namespacedKey == null ? null : ResolvableNamespacedKey.of(namespacedKey);
     }
 
     private @Nullable ResolvableEquipmentSlot loadEquipmentSlot(@Nullable String value) {

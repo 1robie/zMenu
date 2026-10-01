@@ -14,8 +14,15 @@ import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
 import fr.maxlego08.menu.api.utils.resolvable.paper.ResolvableComponent;
 import fr.maxlego08.menu.api.utils.resolvable.paper.ResolvableMusicInstrument;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import org.bukkit.MusicInstrument;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MusicInstrumentMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,5 +62,24 @@ public class InstrumentItemComponentLoader extends ItemComponentLoader {
 
         ResolvableMusicInstrument instrument = new ResolvableMusicInstrument(resolvableNamespacedKey, useDuration, range, description, resolvableSound);
         return dataComponents ? new InstrumentComponent(instrument) : new LegacyInstrumentComponent(instrument);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        if (!(this.plugin.getMetaUpdater() instanceof PaperMetaUpdater)) return null;
+        MusicInstrument instrument = itemStack.getData(DataComponentTypes.INSTRUMENT);
+        if (instrument == null) return null;
+        NamespacedKey key = RegistryAccess.registryAccess().getRegistry(RegistryKey.INSTRUMENT).getKey(instrument);
+        return key == null ? null : new InstrumentComponent(key.asString());
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(this.plugin.getMetaUpdater() instanceof PaperMetaUpdater)) return null;
+        if (!(itemStack.getItemMeta() instanceof MusicInstrumentMeta musicInstrumentMeta)) return null;
+        MusicInstrument instrument = musicInstrumentMeta.getInstrument();
+        if (instrument == null) return null;
+        NamespacedKey key = RegistryAccess.registryAccess().getRegistry(RegistryKey.INSTRUMENT).getKey(instrument);
+        return key == null ? null : new LegacyInstrumentComponent(key.asString());
     }
 }

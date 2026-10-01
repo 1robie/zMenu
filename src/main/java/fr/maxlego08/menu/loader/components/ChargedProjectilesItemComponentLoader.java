@@ -8,8 +8,12 @@ import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.itemstack.components.ChargedProjectilesComponent;
 import fr.maxlego08.menu.api.itemstack.components.legacy.LegacyChargedProjectilesComponent;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ChargedProjectiles;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CrossbowMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,5 +37,22 @@ public class ChargedProjectilesItemComponentLoader extends AbstractMenuItemStack
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new ChargedProjectilesComponent(projectiles)
                 : new LegacyChargedProjectilesComponent(projectiles);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        ChargedProjectiles chargedProjectiles = itemStack.getData(DataComponentTypes.CHARGED_PROJECTILES);
+        if (chargedProjectiles == null || chargedProjectiles.projectiles().isEmpty()) return null;
+
+        List<MenuItemStack> projectiles = this.convertItemStackList(chargedProjectiles.projectiles());
+        return projectiles == null ? null : new ChargedProjectilesComponent(projectiles);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof CrossbowMeta crossbowMeta) || !crossbowMeta.hasChargedProjectiles()) return null;
+
+        List<MenuItemStack> projectiles = this.convertItemStackListFromItemMeta(crossbowMeta.getChargedProjectiles());
+        return projectiles == null ? null : new LegacyChargedProjectilesComponent(projectiles);
     }
 }

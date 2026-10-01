@@ -8,8 +8,11 @@ import fr.maxlego08.menu.api.itemstack.components.UseEffectsComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.UseEffects;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,5 +33,12 @@ public class UseEffectsItemComponentLoader extends ItemComponentLoader {
         ResolvableFloat speedMultiplier = this.asResolvableFloat(componentSection, "speed-multiplier", 0.2f);
         ResolvableBoolean interactVibrations = this.asResolvableBoolean(componentSection, "interact-vibrations", true);
         return new UseEffectsComponent(canSprint, speedMultiplier, interactVibrations);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        UseEffects useEffects = itemStack.getData(DataComponentTypes.USE_EFFECTS);
+        if (useEffects == null) return null;
+        return new UseEffectsComponent(ResolvableBoolean.of(useEffects.canSprint()), ResolvableFloat.of(useEffects.speedMultiplier()), ResolvableBoolean.of(useEffects.interactVibrations()));
     }
 }

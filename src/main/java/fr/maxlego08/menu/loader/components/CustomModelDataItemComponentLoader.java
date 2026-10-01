@@ -10,8 +10,13 @@ import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableString;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.CustomModelData;
+import org.bukkit.Color;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +49,44 @@ public class CustomModelDataItemComponentLoader extends AbstractColorItemCompone
         return MinecraftVersion.isServerAtLeast("1.21.4")
                 ? new CustomModelDataComponent(floats, booleans, strings, colorList)
                 : new LegacyCustomModelDataComponent(floats, booleans, strings, colorList);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        if (!MinecraftVersion.isServerAtLeast("1.21.4")) return null;
+        CustomModelData customModelData = itemStack.getData(DataComponentTypes.CUSTOM_MODEL_DATA);
+        if (customModelData == null) return null;
+        if (customModelData.floats().isEmpty() && customModelData.flags().isEmpty() && customModelData.strings().isEmpty() && customModelData.colors().isEmpty()) {
+            return null;
+        }
+
+        List<ResolvableFloat> floats = new ArrayList<>(customModelData.floats().size());
+        for (Float value : customModelData.floats()) floats.add(ResolvableFloat.of(value));
+
+        List<ResolvableBoolean> flags = new ArrayList<>(customModelData.flags().size());
+        for (Boolean value : customModelData.flags()) flags.add(ResolvableBoolean.of(value));
+
+        List<ResolvableString> strings = new ArrayList<>(customModelData.strings().size());
+        for (String value : customModelData.strings()) {
+            if (value.indexOf('%') != -1) return null;
+            strings.add(ResolvableString.ofExpression(value));
+        }
+
+        List<ResolvableColor> colors = new ArrayList<>(customModelData.colors().size());
+        for (Color value : customModelData.colors()) colors.add(ResolvableColor.of(value));
+
+        return new CustomModelDataComponent(floats, flags, strings, colors);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null || !itemMeta.hasCustomModelData()) return null;
+        int customModelData = itemMeta.getCustomModelData();
+        // The component applies its first float cast to an int
+        float value = customModelData;
+        if ((int) value != customModelData) return null;
+        return new LegacyCustomModelDataComponent(List.of(ResolvableFloat.of(value)), List.of(), List.of(), List.of());
     }
 
     protected @NotNull List<ResolvableFloat> getFloats(@NotNull ConfigurationSection section) {

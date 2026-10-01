@@ -8,8 +8,11 @@ import fr.maxlego08.menu.api.itemstack.components.WeaponComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Weapon;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +37,12 @@ public class WeaponItemComponentLoader extends ItemComponentLoader {
                 itemDamagePerAttack != null ? itemDamagePerAttack : ResolvableInt.of(1),
                 disableBlockingForSeconds != null ? disableBlockingForSeconds : ResolvableFloat.of(0)
         );
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        Weapon weapon = itemStack.getData(DataComponentTypes.WEAPON);
+        return weapon == null ? null : new WeaponComponent(ResolvableInt.of(weapon.itemDamagePerAttack()), ResolvableFloat.of(weapon.disableBlockingForSeconds()));
     }
 }
 

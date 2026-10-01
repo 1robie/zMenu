@@ -11,9 +11,12 @@ import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableColor;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableFireworkEffect;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.FireworkEffect;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkEffectMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,5 +81,22 @@ public class FireworkExplosionItemComponentLoader extends AbstractFireworkItemCo
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new FireworkExplosionComponent(effect)
                 : new LegacyFireworkExplosionComponent(effect);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        FireworkEffect effect = itemStack.getData(DataComponentTypes.FIREWORK_EXPLOSION);
+        if (effect == null) return null;
+        ResolvableFireworkEffect resolvableEffect = toResolvableFireworkEffect(effect);
+        return resolvableEffect == null ? null : new FireworkExplosionComponent(resolvableEffect);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof FireworkEffectMeta fireworkEffectMeta) || !fireworkEffectMeta.hasEffect()) return null;
+        FireworkEffect effect = fireworkEffectMeta.getEffect();
+        if (effect == null) return null;
+        ResolvableFireworkEffect resolvableEffect = toResolvableFireworkEffect(effect);
+        return resolvableEffect == null ? null : new LegacyFireworkExplosionComponent(resolvableEffect);
     }
 }

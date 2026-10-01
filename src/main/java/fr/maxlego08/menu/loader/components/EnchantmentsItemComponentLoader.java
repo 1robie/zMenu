@@ -10,8 +10,12 @@ import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableEnchantment;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableEnchantmentEntry;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ItemEnchantments;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,5 +62,23 @@ public class EnchantmentsItemComponentLoader extends ItemComponentLoader {
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new EnchantementsComponent(enchantments)
                 : new LegacyEnchantementsComponent(enchantments);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        ItemEnchantments enchantments = itemStack.getData(DataComponentTypes.ENCHANTMENTS);
+        if (enchantments == null) return null;
+        List<ResolvableEnchantmentEntry> entries = new ArrayList<>();
+        enchantments.enchantments().forEach((enchantment, level) -> entries.add(new ResolvableEnchantmentEntry(ResolvableEnchantment.of(enchantment), ResolvableInt.of(level))));
+        return new EnchantementsComponent(entries);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null || !itemMeta.hasEnchants()) return null;
+        List<ResolvableEnchantmentEntry> entries = new ArrayList<>();
+        itemMeta.getEnchants().forEach((enchantment, level) -> entries.add(new ResolvableEnchantmentEntry(ResolvableEnchantment.of(enchantment), ResolvableInt.of(level))));
+        return new LegacyEnchantementsComponent(entries);
     }
 }

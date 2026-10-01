@@ -16,6 +16,8 @@ import fr.maxlego08.menu.api.utils.resolvable.paper.ResolvableToolRule;
 import fr.maxlego08.menu.api.utils.resolvable.paper.TagKeySetResolvable;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
 import fr.maxlego08.menu.zcore.logger.Logger;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Tool;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.set.RegistryKeySet;
 import org.bukkit.Bukkit;
@@ -25,11 +27,14 @@ import org.bukkit.Tag;
 import org.bukkit.block.BlockType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -96,6 +101,53 @@ public class ToolItemComponentLoader extends ItemComponentLoader {
         } else {
             Logger.info("A rule of the tool component at " + path + " in " + file.getName() + " has no blocks, it is ignored.", Logger.LogType.WARNING);
         }
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        if (!MinecraftVersion.isServerAtLeast("1.21.5")) return null;
+        Tool tool = itemStack.getData(DataComponentTypes.TOOL);
+        if (tool == null) return null;
+        List<ResolvableToolRule> rules = new ArrayList<>();
+        for (Tool.Rule rule : tool.rules()) {
+            Resolvable<RegistryKeySet<BlockType>> blocks = ResolvableRegistryKeySet.of(rule.blocks());
+            if (blocks == null) return null;
+            ResolvableFloat speed = rule.speed() == null ? null : ResolvableFloat.of(rule.speed());
+            Boolean correctForDrops = rule.correctForDrops().toBoolean();
+            rules.add(new ResolvableToolRule(blocks, speed, correctForDrops == null ? null : ResolvableBoolean.of(correctForDrops)));
+        }
+        return new ToolComponent(ResolvableFloat.of(tool.defaultMiningSpeed()), ResolvableInt.of(tool.damagePerBlock()), ResolvableBoolean.of(tool.canDestroyBlocksInCreative()), rules);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null || !itemMeta.hasTool()) return null;
+        org.bukkit.inventory.meta.components.ToolComponent tool = itemMeta.getTool();
+        if (tool.getDamagePerBlock() < 0) return null;
+
+        List<ResolvableToolRule> rules = new ArrayList<>();
+        for (org.bukkit.inventory.meta.components.ToolComponent.ToolRule rule : tool.getRules()) {
+            Resolvable<RegistryKeySet<BlockType>> blocks = this.toBlocks(rule);
+            if (blocks == null) return null;
+            ResolvableFloat speed = rule.getSpeed() == null ? null : ResolvableFloat.of(rule.getSpeed());
+            ResolvableBoolean correctForDrops = rule.isCorrectForDrops() == null ? null : ResolvableBoolean.of(rule.isCorrectForDrops());
+            rules.add(new ResolvableToolRule(blocks, speed, correctForDrops));
+        }
+        return new LegacyToolComponent(ResolvableFloat.of(tool.getDefaultMiningSpeed()), ResolvableInt.of(tool.getDamagePerBlock()), ResolvableBoolean.of(true), rules);
+    }
+
+    private @Nullable Resolvable<RegistryKeySet<BlockType>> toBlocks(@NotNull org.bukkit.inventory.meta.components.ToolComponent.ToolRule rule) {
+        if (rule.serialize().get("blocks") instanceof String tag && tag.startsWith("#")) {
+            return TagKeySetResolvable.of(RegistryKey.BLOCK, tag);
+        }
+        Collection<Material> materials = rule.getBlocks();
+        if (materials.isEmpty()) return null;
+        List<String> blocks = new ArrayList<>(materials.size());
+        for (Material material : materials) {
+            blocks.add(material.getKey().asString());
+        }
+        return ResolvableRegistryKeySet.typedKeySet(RegistryKey.BLOCK, blocks);
     }
 
     /**

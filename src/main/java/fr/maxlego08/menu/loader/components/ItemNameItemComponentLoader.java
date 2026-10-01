@@ -8,8 +8,12 @@ import fr.maxlego08.menu.api.itemstack.components.legacy.LegacyItemNameComponent
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableString;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,5 +37,20 @@ public class ItemNameItemComponentLoader extends ItemComponentLoader {
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new ItemNameComponent(itemName)
                 : new LegacyItemNameComponent(itemName);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        Component itemName = itemStack.getData(DataComponentTypes.ITEM_NAME);
+        String text = itemName == null ? null : toLegacyText(itemName);
+        return text == null ? null : new ItemNameComponent(ResolvableString.of(text));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        Component itemName = itemMeta == null || !itemMeta.hasItemName() ? null : itemMeta.itemName();
+        String text = itemName == null ? null : toLegacyText(itemName);
+        return text == null ? null : new LegacyItemNameComponent(ResolvableString.of(text));
     }
 }

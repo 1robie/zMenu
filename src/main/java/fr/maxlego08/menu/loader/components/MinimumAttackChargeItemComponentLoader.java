@@ -7,8 +7,10 @@ import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.itemstack.components.MinimumAttackChargeComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,5 +32,11 @@ public class MinimumAttackChargeItemComponentLoader extends ItemComponentLoader 
             return null;
         }
         return new MinimumAttackChargeComponent(charge);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        Float charge = itemStack.getData(DataComponentTypes.MINIMUM_ATTACK_CHARGE);
+        return charge == null ? null : new MinimumAttackChargeComponent(ResolvableFloat.of(charge));
     }
 }

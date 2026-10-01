@@ -7,8 +7,10 @@ import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.itemstack.components.GliderComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,5 +29,10 @@ public class GliderItemComponentLoader extends ItemComponentLoader {
         path = this.normalizePath(path);
         ResolvableBoolean gliderResolvable = this.asResolvableBoolean(configuration, path, true);
         return new GliderComponent(gliderResolvable);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        return itemStack.hasData(DataComponentTypes.GLIDER) ? new GliderComponent(ResolvableBoolean.of(true)) : null;
     }
 }

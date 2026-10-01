@@ -10,8 +10,13 @@ import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableKineticCondition;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableNamespacedKey;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.KineticWeapon;
+import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,6 +55,34 @@ public final class KineticWeaponItemComponentLoader extends ItemComponentLoader 
                 sound,
                 hitSound
         );
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        KineticWeapon kineticWeapon = itemStack.getData(DataComponentTypes.KINETIC_WEAPON);
+        if (kineticWeapon == null) return null;
+        return new KineticWeaponComponent(
+                ResolvableInt.of(kineticWeapon.contactCooldownTicks()),
+                ResolvableInt.of(kineticWeapon.delayTicks()),
+                this.toResolvableCondition(kineticWeapon.dismountConditions()),
+                this.toResolvableCondition(kineticWeapon.knockbackConditions()),
+                this.toResolvableCondition(kineticWeapon.damageConditions()),
+                ResolvableFloat.of(kineticWeapon.forwardMovement()),
+                ResolvableFloat.of(kineticWeapon.damageMultiplier()),
+                this.toResolvableKey(kineticWeapon.sound()),
+                this.toResolvableKey(kineticWeapon.hitSound())
+        );
+    }
+
+    private @Nullable ResolvableKineticCondition toResolvableCondition(KineticWeapon.@Nullable Condition condition) {
+        if (condition == null) return null;
+        return new ResolvableKineticCondition(ResolvableInt.of(condition.maxDurationTicks()), ResolvableFloat.of(condition.minSpeed()), ResolvableFloat.of(condition.minRelativeSpeed()));
+    }
+
+    private @Nullable ResolvableNamespacedKey toResolvableKey(@Nullable Key key) {
+        if (key == null) return null;
+        NamespacedKey namespacedKey = NamespacedKey.fromString(key.asString());
+        return namespacedKey == null ? null : ResolvableNamespacedKey.of(namespacedKey);
     }
 
     private ResolvableKineticCondition loadKineticCondition(@Nullable ConfigurationSection section) {

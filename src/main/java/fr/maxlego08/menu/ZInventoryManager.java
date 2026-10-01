@@ -18,6 +18,7 @@ import fr.maxlego08.menu.api.exceptions.InventoryException;
 import fr.maxlego08.menu.api.exceptions.InventoryFileNotFound;
 import fr.maxlego08.menu.api.font.FontImage;
 import fr.maxlego08.menu.api.itemstack.ItemStackSimilar;
+import fr.maxlego08.menu.api.itemstack.MenuItemStackConversion;
 import fr.maxlego08.menu.api.loader.*;
 import fr.maxlego08.menu.api.pagination.PaginationManager;
 import fr.maxlego08.menu.api.utils.*;
@@ -28,6 +29,7 @@ import fr.maxlego08.menu.common.utils.PlayerUtil;
 import fr.maxlego08.menu.common.utils.ZUtils;
 import fr.maxlego08.menu.common.utils.cache.YamlFileCache;
 import fr.maxlego08.menu.common.utils.cache.YamlFileCacheEntry;
+import fr.maxlego08.menu.common.utils.itemstack.MenuItemStackFromItemStack;
 import fr.maxlego08.menu.common.utils.nms.ItemStackUtils;
 import fr.maxlego08.menu.common.utils.yaml.YamlParser;
 import fr.maxlego08.menu.hooks.packetevents.loader.PacketEventChangeTitleNameLoader;
@@ -830,9 +832,12 @@ public class ZInventoryManager extends ZUtils implements InventoryManager {
             }
         }
 
-        ZMenuItemStack menuItemStack = ZMenuItemStack.fromItemStack(this, itemStack);
         if (type.equalsIgnoreCase("yml")) {
-            menuItemStack.serialize(configuration.createSection("items." + name));
+            MenuItemStackConversion conversion = this.toMenuItemStack(itemStack);
+            conversion.menuItemStack().serialize(configuration.createSection("items." + name));
+            if (!conversion.isReadable()) {
+                message(this.plugin, sender, Message.SAVE_BASE64_FALLBACK, "%name%", name, "%components%", String.join(", ", conversion.unsupportedComponents()));
+            }
         } else if (type.equalsIgnoreCase("base64")) {
             String base64 = ItemStackUtils.serializeItemStack(itemStack);
             configuration.set("items." + name + ".material", "base64:" + base64);
@@ -849,6 +854,11 @@ public class ZInventoryManager extends ZUtils implements InventoryManager {
 
         message(this.plugin, sender, Message.SAVE_SUCCESS, "%name%", name);
 
+    }
+
+    @Override
+    public @NotNull MenuItemStackConversion toMenuItemStack(@NotNull ItemStack itemStack) {
+        return MenuItemStackFromItemStack.convert(this, itemStack);
     }
 
     @EventHandler

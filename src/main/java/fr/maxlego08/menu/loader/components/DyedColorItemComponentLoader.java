@@ -7,8 +7,12 @@ import fr.maxlego08.menu.api.itemstack.components.DyeColorComponent;
 import fr.maxlego08.menu.api.itemstack.components.legacy.LegacyDyeColorComponent;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableColor;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.DyedItemColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,5 +38,17 @@ public class DyedColorItemComponentLoader extends AbstractColorItemComponentLoad
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new DyeColorComponent(color)
                 : new LegacyDyeColorComponent(color);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        DyedItemColor dyedColor = itemStack.getData(DataComponentTypes.DYED_COLOR);
+        return dyedColor == null ? null : new DyeColorComponent(ResolvableColor.of(dyedColor.color()));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof LeatherArmorMeta leatherArmorMeta) || !leatherArmorMeta.isDyed()) return null;
+        return new LegacyDyeColorComponent(ResolvableColor.of(leatherArmorMeta.getColor()));
     }
 }

@@ -4,12 +4,14 @@ import fr.maxlego08.menu.api.context.BuildContext;
 import fr.maxlego08.menu.api.utils.resolvable.ParsableResolvable;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableNamespacedKey;
 import fr.maxlego08.menu.api.utils.resolvable.lang.*;
+import io.papermc.paper.persistence.PersistentDataContainerView;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
@@ -313,6 +315,35 @@ public abstract class ResolvablePersistentDataEntry {
             "byte_array", "int_array", "long_array"
     );
 
+    private static final List<PersistentDataType<?, ?>> READABLE_TYPES = List.of(
+            PersistentDataType.STRING, PersistentDataType.INTEGER, PersistentDataType.LONG, PersistentDataType.DOUBLE,
+            PersistentDataType.FLOAT, PersistentDataType.SHORT, PersistentDataType.BYTE, PersistentDataType.BYTE_ARRAY,
+            PersistentDataType.INTEGER_ARRAY, PersistentDataType.LONG_ARRAY
+    );
+
+
+    @Nullable
+    public static ResolvablePersistentDataEntry fromContainer(@NotNull PersistentDataContainerView container, @NotNull NamespacedKey key) {
+        for (PersistentDataType<?, ?> type : READABLE_TYPES) {
+            if (container.has(key, type)) {
+                Object value = container.get(key, type);
+                return value == null ? null : fromValue(ResolvableNamespacedKey.of(key), value);
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static ResolvablePersistentDataEntry fromContainer(@NotNull PersistentDataContainer container, @NotNull NamespacedKey key) {
+        for (PersistentDataType<?, ?> type : READABLE_TYPES) {
+            if (container.has(key, type)) {
+                Object value = container.get(key, type);
+                return value == null ? null : fromValue(ResolvableNamespacedKey.of(key), value);
+            }
+        }
+        return null;
+    }
+
     @Nullable
     public static ResolvablePersistentDataEntry fromKeyValue(@NotNull String rawKey, @NotNull Object rawValue) {
         ResolvableNamespacedKey key = ResolvableNamespacedKey.auto(rawKey);
@@ -324,6 +355,7 @@ public abstract class ResolvablePersistentDataEntry {
         return switch (rawValue) {
             case String str -> fromStringValue(key, str);
             case Integer intValue -> new IntEntry(key, ResolvableInt.of(intValue));
+            case Long longValue -> new LongEntry(key, ResolvableLong.of(longValue));
             case Boolean boolValue -> new BooleanEntry(key, ResolvableBoolean.of(boolValue));
             case Double doubleValue -> new DoubleEntry(key, ResolvableDouble.of(doubleValue));
             case Float floatValue -> new FloatEntry(key, ResolvableFloat.of(floatValue));

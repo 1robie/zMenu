@@ -1,9 +1,14 @@
 package fr.maxlego08.menu.loader.components;
 
 import fr.maxlego08.menu.api.utils.ColorUtils;
+import fr.maxlego08.menu.api.utils.resolvable.SimpleResolvable;
+import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableColor;
+import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableFireworkEffect;
+import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.Map;
@@ -53,5 +58,27 @@ public abstract class AbstractFireworkItemComponentLoader extends AbstractColorI
             builder.flicker(hasTwinkle);
         }
         return Optional.of(builder.build());
+    }
+
+    /**
+     * @return The effect as the firework loaders read it, or null when it has no color or more than one color or fade color,
+     * since the configuration holds a single color and a single fade color.
+     */
+    protected static @Nullable ResolvableFireworkEffect toResolvableFireworkEffect(@NotNull FireworkEffect effect) {
+        if (effect.getColors().size() != 1 || effect.getFadeColors().size() > 1) return null;
+        Color fadeColor = effect.getFadeColors().isEmpty() ? null : effect.getFadeColors().getFirst();
+        return new ResolvableFireworkEffect(
+                SimpleResolvable.of(effect.getType(), s -> {
+                    try {
+                        return FireworkEffect.Type.valueOf(s.toUpperCase(Locale.ROOT));
+                    } catch (IllegalArgumentException e) {
+                        return null;
+                    }
+                }),
+                ResolvableColor.of(effect.getColors().getFirst()),
+                fadeColor == null ? null : ResolvableColor.of(fadeColor),
+                ResolvableBoolean.of(effect.hasTrail()),
+                ResolvableBoolean.of(effect.hasFlicker())
+        );
     }
 }

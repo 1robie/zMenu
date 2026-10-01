@@ -12,8 +12,14 @@ import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableString;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.LodestoneTracker;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,6 +43,47 @@ public class LodestoneTrackerItemComponentLoader extends ItemComponentLoader {
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new LodestoneTrackerComponent(lodestoneTracked, lodestoneLocation)
                 : new LegacyLodestoneTrackerComponent(lodestoneTracked, lodestoneLocation);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        LodestoneTracker tracker = itemStack.getData(DataComponentTypes.LODESTONE_TRACKER);
+        if (tracker == null) return null;
+
+        ResolvableLodestoneLocation lodestoneLocation = null;
+        Location location = tracker.location();
+        if (location != null) {
+            World world = location.getWorld();
+            if (world == null || Resolvable.isExpression(world.getName())) return null;
+            lodestoneLocation = new ResolvableLodestoneLocation(
+                    ResolvableInt.of(location.getBlockX()),
+                    ResolvableInt.of(location.getBlockY()),
+                    ResolvableInt.of(location.getBlockZ()),
+                    ResolvableString.of(world.getName())
+            );
+        }
+        return new LodestoneTrackerComponent(ResolvableBoolean.of(tracker.tracked()), lodestoneLocation);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof CompassMeta compassMeta)) return null;
+        if (!compassMeta.hasLodestone() && !compassMeta.isLodestoneTracked()) return null;
+
+        ResolvableLodestoneLocation lodestoneLocation = null;
+        if (compassMeta.hasLodestone()) {
+            Location location = compassMeta.getLodestone();
+            if (location == null || !location.isWorldLoaded()) return null;
+            World world = location.getWorld();
+            if (world == null || Resolvable.isExpression(world.getName())) return null;
+            lodestoneLocation = new ResolvableLodestoneLocation(
+                    ResolvableInt.of(location.getBlockX()),
+                    ResolvableInt.of(location.getBlockY()),
+                    ResolvableInt.of(location.getBlockZ()),
+                    ResolvableString.of(world.getName())
+            );
+        }
+        return new LegacyLodestoneTrackerComponent(ResolvableBoolean.of(compassMeta.isLodestoneTracked()), lodestoneLocation);
     }
 
     private @Nullable ResolvableLodestoneLocation parseTarget(@Nullable ConfigurationSection targetSection) {

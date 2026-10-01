@@ -8,8 +8,11 @@ import fr.maxlego08.menu.api.itemstack.components.ItemModelComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableNamespacedKey;
 import org.bukkit.NamespacedKey;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.key.Key;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,5 +39,12 @@ public class ItemModelItemComponentLoader extends ItemComponentLoader {
         NamespacedKey namespacedKey = NamespacedKey.fromString(modelIdStr);
 
         return namespacedKey != null ? new ItemModelComponent(ResolvableNamespacedKey.of(namespacedKey)) : null;
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        Key model = itemStack.getData(DataComponentTypes.ITEM_MODEL);
+        NamespacedKey namespacedKey = model == null ? null : NamespacedKey.fromString(model.asString());
+        return namespacedKey == null ? null : new ItemModelComponent(ResolvableNamespacedKey.of(namespacedKey));
     }
 }

@@ -10,9 +10,11 @@ import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableEnum;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
 import fr.maxlego08.menu.api.utils.resolvable.paper.ResolvableSwingAnimation;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.SwingAnimation;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,5 +37,12 @@ public final class SwingAnimationItemComponentLoader extends ItemComponentLoader
         ResolvableInt duration = ResolvableInt.autoOrNull(componentSection.getString("duration"));
 
         return new SwingAnimationComponent(new ResolvableSwingAnimation(type, duration));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        SwingAnimation swingAnimation = itemStack.getData(DataComponentTypes.SWING_ANIMATION);
+        if (swingAnimation == null) return null;
+        return new SwingAnimationComponent(new ResolvableSwingAnimation(ResolvableEnum.of(SwingAnimation.Animation.class, swingAnimation.type()), ResolvableInt.of(swingAnimation.duration())));
     }
 }

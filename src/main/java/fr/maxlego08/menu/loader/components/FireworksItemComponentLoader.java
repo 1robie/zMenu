@@ -12,9 +12,13 @@ import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableFireworkEffect;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Fireworks;
 import org.bukkit.FireworkEffect;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,6 +56,36 @@ public class FireworksItemComponentLoader extends AbstractFireworkItemComponentL
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new FireworksComponent(flightDuration, effects)
                 : new LegacyFireworksComponent(flightDuration, effects);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        Fireworks fireworks = itemStack.getData(DataComponentTypes.FIREWORKS);
+        if (fireworks == null) return null;
+        if (fireworks.effects().isEmpty() && fireworks.flightDuration() == 1) return null;
+
+        List<ResolvableFireworkEffect> effects = new ArrayList<>(fireworks.effects().size());
+        for (FireworkEffect effect : fireworks.effects()) {
+            ResolvableFireworkEffect resolvableEffect = toResolvableFireworkEffect(effect);
+            if (resolvableEffect == null) return null;
+            effects.add(resolvableEffect);
+        }
+        return new FireworksComponent(ResolvableInt.of(fireworks.flightDuration()), effects);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof FireworkMeta fireworkMeta)) return null;
+        int power = fireworkMeta.getPower();
+        if (!fireworkMeta.hasEffects() && (power == 0 || power == 1)) return null;
+
+        List<ResolvableFireworkEffect> effects = new ArrayList<>(fireworkMeta.getEffectsSize());
+        for (FireworkEffect effect : fireworkMeta.getEffects()) {
+            ResolvableFireworkEffect resolvableEffect = toResolvableFireworkEffect(effect);
+            if (resolvableEffect == null) return null;
+            effects.add(resolvableEffect);
+        }
+        return new LegacyFireworksComponent(ResolvableInt.of(power), effects);
     }
 
     private @Nullable ResolvableFireworkEffect parseFireworkEffect(Map<String, Object> data) {

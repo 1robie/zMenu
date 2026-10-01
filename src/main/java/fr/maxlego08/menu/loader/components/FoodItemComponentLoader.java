@@ -10,8 +10,12 @@ import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.FoodProperties;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,5 +44,20 @@ public class FoodItemComponentLoader extends ItemComponentLoader {
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new FoodComponent(nutrition, saturation, canAlwaysEat)
                 : new LegacyFoodComponent(nutrition, saturation, canAlwaysEat);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        FoodProperties food = itemStack.getData(DataComponentTypes.FOOD);
+        if (food == null) return null;
+        return new FoodComponent(ResolvableInt.of(food.nutrition()), ResolvableFloat.of(food.saturation()), ResolvableBoolean.of(food.canAlwaysEat()));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null || !itemMeta.hasFood()) return null;
+        org.bukkit.inventory.meta.components.FoodComponent food = itemMeta.getFood();
+        return new LegacyFoodComponent(ResolvableInt.of(food.getNutrition()), ResolvableFloat.of(food.getSaturation()), ResolvableBoolean.of(food.canAlwaysEat()));
     }
 }

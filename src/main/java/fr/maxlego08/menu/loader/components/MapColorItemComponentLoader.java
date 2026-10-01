@@ -8,8 +8,13 @@ import fr.maxlego08.menu.api.itemstack.components.MapColorComponent;
 import fr.maxlego08.menu.api.itemstack.components.legacy.LegacyMapColorComponent;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableColor;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.MapItemColor;
+import org.bukkit.Color;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,5 +38,18 @@ public class MapColorItemComponentLoader extends AbstractColorItemComponentLoade
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new MapColorComponent(resolvableColor)
                 : new LegacyMapColorComponent(resolvableColor);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        MapItemColor mapColor = itemStack.getData(DataComponentTypes.MAP_COLOR);
+        return mapColor == null ? null : new MapColorComponent(ResolvableColor.of(mapColor.color()));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof MapMeta mapMeta) || !mapMeta.hasColor()) return null;
+        Color color = mapMeta.getColor();
+        return color == null ? null : new LegacyMapColorComponent(ResolvableColor.of(color));
     }
 }

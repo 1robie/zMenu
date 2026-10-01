@@ -10,13 +10,17 @@ import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableRegistry;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableRegistryEntry;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableBoolean;
 import io.papermc.paper.datacomponent.DataComponentType;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,5 +43,19 @@ public class TooltipDisplayItemComponentLoader extends ItemComponentLoader {
 
 
         return new TooltipDisplayComponent(hideTooltip, hiddenComponentEntries);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        TooltipDisplay tooltipDisplay = itemStack.getData(DataComponentTypes.TOOLTIP_DISPLAY);
+        if (tooltipDisplay == null) return null;
+
+        List<ResolvableRegistryEntry<DataComponentType>> hiddenComponents = new ArrayList<>(tooltipDisplay.hiddenComponents().size());
+        for (DataComponentType type : tooltipDisplay.hiddenComponents()) {
+            ResolvableRegistryEntry<DataComponentType> entry = ResolvableRegistry.ofRegisteredOrNull(type, RegistryKey.DATA_COMPONENT_TYPE);
+            if (entry == null) return null;
+            hiddenComponents.add(entry);
+        }
+        return new TooltipDisplayComponent(ResolvableBoolean.of(tooltipDisplay.hideTooltip()), hiddenComponents);
     }
 }

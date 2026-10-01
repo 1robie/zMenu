@@ -8,8 +8,11 @@ import fr.maxlego08.menu.api.itemstack.components.legacy.LegacyDamageComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,5 +35,17 @@ public class DamageItemComponentLoader extends ItemComponentLoader {
                     : new LegacyDamageComponent(damages);
         }
         return null;
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        Integer damage = itemStack.getData(DataComponentTypes.DAMAGE);
+        return damage == null ? null : new DamageComponent(ResolvableInt.of(damage));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof Damageable damageable) || !damageable.hasDamage()) return null;
+        return new LegacyDamageComponent(ResolvableInt.of(damageable.getDamage()));
     }
 }

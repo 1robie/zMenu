@@ -8,9 +8,11 @@ import fr.maxlego08.menu.api.itemstack.components.ProvidesTrimMaterialComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableRegistry;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableRegistryEntry;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,5 +33,13 @@ public class ProvidesTrimMaterialItemComponentLoader extends ItemComponentLoader
         String value = configuration.getString(path);
         ResolvableRegistryEntry<TrimMaterial> trimMaterialResolvableRegistryEntry = ResolvableRegistry.autoOrNull(value, RegistryKey.TRIM_MATERIAL);
         return new ProvidesTrimMaterialComponent(trimMaterialResolvableRegistryEntry);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        TrimMaterial trimMaterial = itemStack.getData(DataComponentTypes.PROVIDES_TRIM_MATERIAL);
+        if (trimMaterial == null) return null;
+        ResolvableRegistryEntry<TrimMaterial> material = ResolvableRegistry.ofRegisteredOrNull(trimMaterial, RegistryKey.TRIM_MATERIAL);
+        return material == null ? null : new ProvidesTrimMaterialComponent(material);
     }
 }

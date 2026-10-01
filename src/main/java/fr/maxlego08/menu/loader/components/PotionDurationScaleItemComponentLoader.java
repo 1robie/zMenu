@@ -7,8 +7,10 @@ import fr.maxlego08.menu.api.itemstack.ItemComponent;
 import fr.maxlego08.menu.api.itemstack.components.PotionDurationScaleComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,5 +29,11 @@ public class PotionDurationScaleItemComponentLoader extends ItemComponentLoader 
         path = this.normalizePath(path);
         ResolvableFloat durationScale = this.asResolvableFloat(configuration, path, 1.0f);
         return new PotionDurationScaleComponent(durationScale);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        Float durationScale = itemStack.getData(DataComponentTypes.POTION_DURATION_SCALE);
+        return durationScale == null ? null : new PotionDurationScaleComponent(ResolvableFloat.of(durationScale));
     }
 }

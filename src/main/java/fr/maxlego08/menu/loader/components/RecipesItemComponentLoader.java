@@ -8,8 +8,13 @@ import fr.maxlego08.menu.api.itemstack.components.legacy.LegacyRecipesComponent;
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableNamespacedKey;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.KnowledgeBookMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,5 +41,32 @@ public class RecipesItemComponentLoader extends ItemComponentLoader {
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new RecipesComponent(recipes)
                 : new LegacyRecipesComponent(recipes);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        List<Key> keys = itemStack.getData(DataComponentTypes.RECIPES);
+        if (keys == null || keys.isEmpty()) return null;
+
+        List<ResolvableNamespacedKey> recipes = new ArrayList<>(keys.size());
+        for (Key key : keys) {
+            NamespacedKey namespacedKey = NamespacedKey.fromString(key.asString());
+            if (namespacedKey == null) return null;
+            recipes.add(ResolvableNamespacedKey.of(namespacedKey));
+        }
+        return new RecipesComponent(recipes);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof KnowledgeBookMeta knowledgeBookMeta) || !knowledgeBookMeta.hasRecipes()) return null;
+        List<NamespacedKey> keys = knowledgeBookMeta.getRecipes();
+        if (keys.isEmpty()) return null;
+
+        List<ResolvableNamespacedKey> recipes = new ArrayList<>(keys.size());
+        for (NamespacedKey key : keys) {
+            recipes.add(ResolvableNamespacedKey.of(key));
+        }
+        return new LegacyRecipesComponent(recipes);
     }
 }

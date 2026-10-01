@@ -4,9 +4,12 @@ import fr.maxlego08.menu.api.context.BuildContext;
 import fr.maxlego08.menu.api.utils.resolvable.Resolvable;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvableNamespacedKey;
 import fr.maxlego08.menu.api.utils.resolvable.bukkit.ResolvablePotionEffect;
-import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableFloat;
+import fr.maxlego08.menu.api.utils.resolvable.lang.*;
 import io.papermc.paper.datacomponent.item.consumable.ConsumeEffect;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.set.RegistryKeySet;
+import io.papermc.paper.registry.tag.Tag;
 import org.bukkit.NamespacedKey;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -19,6 +22,50 @@ import java.util.List;
 import java.util.Map;
 
 public sealed interface PaperResolvableConsumeEffect extends Resolvable<ConsumeEffect> permits PaperResolvableConsumeEffect.PlaySound, PaperResolvableConsumeEffect.ApplyEffects, PaperResolvableConsumeEffect.TeleportRandomly, PaperResolvableConsumeEffect.ClearAllEffects, PaperResolvableConsumeEffect.RemoveEffects {
+
+    static @Nullable PaperResolvableConsumeEffect of(@NotNull ConsumeEffect effect) {
+        switch (effect) {
+            case ConsumeEffect.PlaySound playSound -> {
+                NamespacedKey sound = NamespacedKey.fromString(playSound.sound().asString());
+                return sound == null ? null : new PlaySound(ResolvableNamespacedKey.of(sound));
+            }
+            case ConsumeEffect.ApplyStatusEffects applyStatusEffects -> {
+                if (applyStatusEffects.effects().isEmpty()) return null;
+                List<ResolvablePotionEffect> potionEffects = new ArrayList<>();
+                for (PotionEffect potionEffect : applyStatusEffects.effects()) {
+                    int amplifier = potionEffect.getAmplifier();
+                    if (amplifier != 0 && amplifier != 1) return null;
+                    potionEffects.add(new ResolvablePotionEffect(
+                            ResolvableString.of(potionEffect.getType().getKey().asString()),
+                            ResolvableInt.of(potionEffect.getDuration()),
+                            ResolvableByte.of((byte) amplifier),
+                            ResolvableBoolean.of(potionEffect.isAmbient()),
+                            ResolvableBoolean.of(potionEffect.hasParticles()),
+                            ResolvableBoolean.of(potionEffect.hasIcon())
+                    ));
+                }
+                return new ApplyEffects(potionEffects, ResolvableFloat.of(applyStatusEffects.probability()));
+            }
+            case ConsumeEffect.TeleportRandomly teleportRandomly -> {
+                return new TeleportRandomly(ResolvableFloat.of(teleportRandomly.diameter()));
+            }
+            case ConsumeEffect.ClearAllStatusEffects ignored -> {
+                return new ClearAllEffects();
+            }
+            case ConsumeEffect.RemoveStatusEffects removeStatusEffects -> {
+                RegistryKeySet<PotionEffectType> effectTypes = removeStatusEffects.removeEffects();
+                if (effectTypes instanceof Tag<PotionEffectType> || effectTypes.values().isEmpty()) return null;
+                List<String> keys = new ArrayList<>();
+                for (TypedKey<PotionEffectType> key : effectTypes.values()) {
+                    keys.add(key.key().asString());
+                }
+                return new RemoveEffects(ResolvableRegistryKeySet.typedKeySet(RegistryKey.MOB_EFFECT, keys));
+            }
+            default -> {
+            }
+        }
+        return null;
+    }
 
     record PlaySound(@NotNull ResolvableNamespacedKey sound) implements PaperResolvableConsumeEffect {
         @Override

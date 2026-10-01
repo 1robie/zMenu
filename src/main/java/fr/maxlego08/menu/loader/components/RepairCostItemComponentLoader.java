@@ -8,8 +8,11 @@ import fr.maxlego08.menu.api.itemstack.components.legacy.LegacyRepairCostCompone
 import fr.maxlego08.menu.api.loader.ItemComponentLoader;
 import fr.maxlego08.menu.api.utils.resolvable.lang.ResolvableInt;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Repairable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,5 +33,17 @@ public class RepairCostItemComponentLoader extends ItemComponentLoader {
         return MinecraftVersion.isServerAtLeast("1.21.3")
                 ? new RepairCostComponent(cost)
                 : new LegacyRepairCostComponent(cost);
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemStack(@NotNull ItemStack itemStack) {
+        Integer cost = itemStack.getData(DataComponentTypes.REPAIR_COST);
+        return cost == null ? null : new RepairCostComponent(ResolvableInt.of(cost));
+    }
+
+    @Override
+    public @Nullable ItemComponent fromItemMeta(@NotNull ItemStack itemStack) {
+        if (!(itemStack.getItemMeta() instanceof Repairable repairable) || !repairable.hasRepairCost()) return null;
+        return new LegacyRepairCostComponent(ResolvableInt.of(repairable.getRepairCost()));
     }
 }
