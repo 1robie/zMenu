@@ -76,12 +76,16 @@ public class DialogLoader implements Loader<AbstractDialogInventory> {
                 Logger.info("Failed to load open requirement: " + e.getMessage(), Logger.LogType.WARNING);
             }
         }
-        if (configuration.isConfigurationSection("inventory-replacement")){
-            String replacementName = configuration.getString("inventory-replacement.name", "");
-            String replacementPlugin = configuration.getString("inventory-replacement.plugin", InventoryReplacement.DEFAULT_PLUGIN);
-            List<Integer> replacementPages = configuration.getIntegerList("inventory-replacement.pages");
-            InventoryReplacement inventoryReplacement = new InventoryReplacement(replacementName, replacementPlugin, replacementPages);
-            dialogInventory.setInventoryReplacement(inventoryReplacement);
+        if (configuration.isConfigurationSection("inventory-replacement")) {
+            ConfigurationSection inventorySection = configuration.getConfigurationSection("inventory-replacement");
+            if (inventorySection != null) {
+                InventoryReplacement inventoryReplacement = InventoryReplacement.deserialize(inventorySection);
+                if (inventoryReplacement != null) {
+                    dialogInventory.setInventoryReplacement(inventoryReplacement);
+                } else {
+                    Logger.info("The inventory-replacement of the dialog " + file.getName() + " has no name, it will be ignored.", Logger.LogType.WARNING);
+                }
+            }
         }
         if (configuration.isConfigurationSection("fallback-inventory")) {
             String fallbackName = configuration.getString("fallback-inventory.name", "");

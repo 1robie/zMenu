@@ -45,13 +45,13 @@ import fr.maxlego08.menu.hooks.ComponentMeta;
 import fr.maxlego08.menu.hooks.NexoTagResolverLoader;
 import fr.maxlego08.menu.hooks.bedrock.ZBedrockManager;
 import fr.maxlego08.menu.hooks.bedrock.listener.BedrockReplacementListener;
-import fr.maxlego08.menu.hooks.paper.PaperProtocolClientVersionProvider;
-import fr.maxlego08.menu.hooks.protocolsupport.ProtocolSupportClientVersionProvider;
-import fr.maxlego08.menu.hooks.viaversion.ViaVersionClientVersionProvider;
 import fr.maxlego08.menu.hooks.dialogs.ZDialogManager;
 import fr.maxlego08.menu.hooks.packetevents.PacketEventPlayerInventoryManager;
 import fr.maxlego08.menu.hooks.packetevents.PacketUtils;
 import fr.maxlego08.menu.hooks.packetevents.loader.PacketEventTitleAnimationLoader;
+import fr.maxlego08.menu.hooks.paper.PaperProtocolClientVersionProvider;
+import fr.maxlego08.menu.hooks.protocolsupport.ProtocolSupportClientVersionProvider;
+import fr.maxlego08.menu.hooks.viaversion.ViaVersionClientVersionProvider;
 import fr.maxlego08.menu.inventory.VInventoryManager;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.menu.listener.ItemUpdaterListener;
@@ -300,7 +300,7 @@ public class ZMenuPlugin extends ZPlugin implements fr.maxlego08.menu.api.MenuPl
             boolean loaded = this.safeHook("Bedrock", () -> {
                 Logger.info("Geyser or Floodgate detected, loading Bedrock Inventory support");
                 this.bedrockManager = new ZBedrockManager(this);
-                this.addListener(new BedrockReplacementListener(this.bedrockManager));
+                this.addListener(new BedrockReplacementListener(this.bedrockManager, this.inventoryManager));
                 servicesManager.register(BedrockManager.class, this.bedrockManager, this, ServicePriority.Highest);
             });
             if (!loaded) {

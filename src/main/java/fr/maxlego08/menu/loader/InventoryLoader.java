@@ -161,11 +161,13 @@ public class InventoryLoader extends ZUtils implements Loader<Inventory> {
         inventory.setClickLimiterEnabled(configuration.getBoolean(path + "click-limiter-enabled", true));
         inventory.setFile(file);
         if (configuration.isConfigurationSection("inventory-replacement")){
-            String replacementName = configuration.getString("inventory-replacement.name", "");
-            String replacementPlugin = configuration.getString("inventory-replacement.plugin", "zMenu");
-            List<Integer> replacementPages = configuration.getIntegerList("inventory-replacement.pages");
-            InventoryReplacement inventoryReplacement = new InventoryReplacement(replacementName, replacementPlugin, replacementPages);
-            inventory.setInventoryReplacement(inventoryReplacement);
+            ConfigurationSection replacementSection = configuration.getConfigurationSection("inventory-replacement");
+            if (replacementSection != null) {
+                InventoryReplacement inventoryReplacement = InventoryReplacement.deserialize(replacementSection);
+                if (inventoryReplacement != null) {
+                    inventory.setInventoryReplacement(inventoryReplacement);
+                }
+            }
         }
 
         this.loadFillItem(configuration, inventory, menuItemStackLoader, file);
