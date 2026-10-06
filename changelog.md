@@ -42,6 +42,23 @@
 
 # Unreleased
 
+## New Features
+
+* Added DeluxeMenus conversion support with `/zm convert deluxemenus [menu]` (also available as `dm`), allowing DeluxeMenus configurations to be converted into zMenu inventories and reporting unsupported or partially converted features.
+* Added ItemStack-to-zMenu conversion support, including conversion of supported Minecraft item components.
+* Added serialization support for inventories, menu items, buttons, actions, requirements, item components, commands and related API objects, allowing these objects to be written back in the format understood by zMenu.
+* Added parent/child placeholder scopes and placeholder modifiers, while improving placeholder processing performance.
+* Added inventory replacement modes with support for `CUMULUS` and `CHEST` (bedrock player).
+* Added support for using Bukkit dye color names when parsing colors, including `minecraft:<color>` names.
+
+## Improvements
+
+* Improved hook loading so failures caused by third-party plugins, missing classes, invalid versions or broken APIs no longer abort the entire hook registration process.
+* Improved PacketEvents integration with API availability and readiness checks. Packet-based features are now safely disabled when PacketEvents is unavailable instead of causing zMenu to fail.
+* Improved plugin shutdown handling so partially initialized managers are still safely disabled and cleaned up after an initialization failure.
+* Added serialization coverage tests for registered actions, requirements and item components to ensure they can be serialized and loaded without losing their configuration.
+* Updated the minimum supported (documentation) Minecraft version to 1.20.6.
+
 ## Improvements
 
 - **zMenu now loads on Spigot, and explains why it cannot run there**: zMenu is a Paper plugin and only
