@@ -480,6 +480,7 @@ public class ZMenuPlugin extends ZPlugin implements fr.maxlego08.menu.api.MenuPl
             files.add("dialogs/multi_action-dialog.yml");
             files.add("dialogs/server_link-dialog.yml");
             files.add("dialogs/dynamic-dialog-example.yml");
+            files.add("dialogs/dialog_list-dialog.yml");
         }
 
         if (this.hasBedrockSupport()) {

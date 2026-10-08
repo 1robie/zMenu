@@ -39,7 +39,7 @@ public class DialogLoader implements Loader<AbstractDialogInventory> {
         File file = (File) objects[0];
 
         String name = configuration.getString("name", "");
-        String externalTitle = configuration.getString("external-title", "");
+        String externalTitle = configuration.getString("external-title", configuration.getString("external_title", ""));
 
         String typeString = configuration.getString("type", "NOTICE");
         DialogType dialogType;
