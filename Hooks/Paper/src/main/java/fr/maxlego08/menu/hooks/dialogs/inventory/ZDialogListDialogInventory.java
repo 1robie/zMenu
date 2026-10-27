@@ -106,8 +106,8 @@ public class ZDialogListDialogInventory extends AbstractButtonUtilsInventory imp
 
     @Override
     public Dialog buildDialog(@NotNull Player player, @NotNull PaperMetaUpdater paperComponent, @NotNull InventoryEngine inventoryEngine, @NotNull Placeholders placeholders) {
-        List<DialogBody> dialogBodiesForPlayer = this.getDialogBodiesForPlayer(player, paperComponent);
-        List<DialogInput> dialogInputsForPlayer = this.getDialogInputsForPlayer(player, paperComponent);
+        List<DialogBody> dialogBodiesForPlayer = this.getDialogBodiesForPlayer(player, paperComponent, placeholders);
+        List<DialogInput> dialogInputsForPlayer = this.getDialogInputsForPlayer(player, paperComponent, placeholders);
 
         // Built before entering this list's frame, so a nested list receives the back button of its parent
         ActionButton exitAction = this.exitOrBackButton(this.exitButton != null ? this.createActionButton(this.exitButton.parse(player), dialogInputsForPlayer, paperComponent, placeholders, player, inventoryEngine, null) : null);
