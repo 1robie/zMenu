@@ -198,11 +198,8 @@ public class ZDialogListDialogInventory extends AbstractButtonUtilsInventory imp
     }
 
     private ActionButton createBackButton(@NotNull Player player, @NotNull PaperMetaUpdater paperComponent) {
-        DialogAction action = DialogAction.customClick((view, audience) -> {
-            if (audience instanceof Player viewer) {
-                this.menuPlugin.getScheduler().runAtEntity(viewer, task -> this.menuPlugin.getDialogManager().openDialog(viewer, this));
-            }
-        }, ClickCallback.Options.builder().uses(ClickCallback.UNLIMITED_USES).build());
+        DialogAction action = this.menuPlugin.getDialogManager().clickAction(player,
+                (viewer, view) -> this.menuPlugin.getDialogManager().openDialog(viewer, this), ClickCallback.UNLIMITED_USES, null);
         String tooltip = this.backButton.tooltip();
         return ActionButton.create(
                 paperComponent.getComponent(this.menuPlugin.parse(player, this.backButton.label())),

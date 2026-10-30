@@ -323,3 +323,46 @@ close-on-damage: true
 # including the content of nested lists, in the packet that opens it, so deep nesting makes that
 # packet bigger and can disconnect the player. Lists nested deeper than this are left out.
 dialog-list-max-depth: 4
+
+# Dialog canvases draw images and text at pixel positions inside dialogs (body type dialog-canvas).
+# zMenu generates the fonts they need into plugins/zMenu/resource-pack/output, from the dialogs that use them.
+dialog-canvas:
+  resource-pack:
+    # Who adds zMenu's files to the resource pack players download:
+    # auto: the pack plugin installed on the server (Nexo, ItemsAdder or CraftEngine). With several of them,
+    #       nothing is done until one is chosen here. Without any, standalone when its url is set, else none.
+    # nexo, itemsadder, craftengine: that plugin.
+    # standalone: zMenu sends plugins/zMenu/resource-pack/zmenu-pack.zip from the url below.
+    # none: you add plugins/zMenu/resource-pack/zmenu-pack.zip (or the output folder) to your pack yourself.
+    target: auto
+    # Run the pack plugin's rebuild command (/nexo reload pack, /iazip, /ce reload pack) when zMenu's files
+    # changed after /zm reload. When false, zMenu only tells you which command to run.
+    auto-rebuild: false
+    standalone:
+      # Where you upload zmenu-pack.zip. zMenu does not host it, and sends it with its SHA-1, so upload it again
+      # each time zMenu says the pack changed.
+      url: ""
+      # Kick players who decline the pack.
+      required: false
+      # Shown when the pack is offered (MiniMessage), empty for none.
+      prompt: "<gray>Interface of the server menus"
+  # When players see the fallback text of a canvas instead of the canvas:
+  # - auto: with the standalone pack, until the player loaded it. With Nexo, ItemsAdder, CraftEngine or a pack
+  #   of server.properties, only after the player declined it or it failed, including packs sent while the
+  #   player joins.
+  # - true: until a resource pack is reported loaded.
+  # - false: never.
+  require-pack: auto
+  # How long, in seconds, the buttons of an opened canvas keep working. Opening the dialog again resets it.
+  click-lifetime-seconds: 600
+  # Download the font and textures of the vanilla client from Mojang once per Minecraft version, to measure
+  # text in the default font and to draw vanilla textures (glyph: minecraft:item/diamond).
+  # zMenu only downloads them once a loaded dialog has a canvas that needs them. They are kept in plugins/zMenu/cache/vanilla and are never added to the resource pack (except the shader
+  # of hide-focus-outline).
+  download-vanilla-assets: true
+  # Experimental: a click on a canvas makes the client draw a white outline around the dialog body. The client
+  # draws it in code, so no texture can change it; this adds the client's gui shaders to the pack, changed to
+  # skip white 1 pixel lines exactly as long as the outline of one of your canvases. Other white of the
+  # client's screens stays. It replaces the gui shaders of any other pack and needs download-vanilla-assets.
+  # debug paints instead of hiding: red = hidden, green = another white 1 pixel line, blue = other white.
+  hide-focus-outline: false

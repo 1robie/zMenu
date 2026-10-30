@@ -2,19 +2,18 @@ package fr.maxlego08.menu.api.registry;
 
 import fr.maxlego08.menu.api.Inventory;
 import fr.maxlego08.menu.api.InventoryOptionType;
-import fr.maxlego08.menu.api.button.ButtonOptionType;
 import fr.maxlego08.menu.api.ZMenuKeys;
 import fr.maxlego08.menu.api.animation.slot.Animation;
+import fr.maxlego08.menu.api.button.ButtonOptionType;
 import fr.maxlego08.menu.api.command.CommandArgumentValidator;
+import fr.maxlego08.menu.api.dialog.canvas.CanvasElementLoader;
+import fr.maxlego08.menu.api.dialog.canvas.CanvasPackTarget;
+import fr.maxlego08.menu.api.dialog.canvas.GlyphProvider;
 import fr.maxlego08.menu.api.itemstack.ItemStackSimilar;
-import fr.maxlego08.menu.api.loader.ActionLoader;
-import fr.maxlego08.menu.api.loader.ButtonLoader;
-import fr.maxlego08.menu.api.loader.ItemComponentLoader;
-import fr.maxlego08.menu.api.loader.MaterialLoader;
-import fr.maxlego08.menu.api.loader.PermissibleLoader;
+import fr.maxlego08.menu.api.loader.*;
+import fr.maxlego08.menu.api.loader.animation.slot.SlotAnimationLoader;
 import fr.maxlego08.menu.api.mechanic.MechanicFactory;
 import fr.maxlego08.menu.api.rules.loader.RuleLoader;
-import fr.maxlego08.menu.api.loader.animation.slot.SlotAnimationLoader;
 
 public final class Registries {
     public static final RegistryType<SlotAnimationLoader> SLOT_ANIMATION = RegistryType.createStatic(ZMenuKeys.key("slot_animation"), SlotAnimationLoader.class);
@@ -80,6 +79,25 @@ public final class Registries {
      * The options added to every inventory, such as zMenuPlus's conditional names.
      */
     public static final RegistryType<InventoryOptionType> INVENTORY_OPTION = RegistryType.createOpen(ZMenuKeys.key("inventory_option"), InventoryOptionType.class);
+
+    /**
+     * The sources of the images a dialog canvas can draw, by the prefix of a glyph reference:
+     * {@code zmenu}, {@code minecraft}, {@code nexo}, {@code itemsadder}, {@code craftengine}...
+     */
+    public static final RegistryType<GlyphProvider> GLYPH_PROVIDER = RegistryType.createOpen(ZMenuKeys.key("glyph_provider"), GlyphProvider.class);
+
+    /**
+     * The ways to deliver the resource pack of dialog canvases, by name: {@code nexo},
+     * {@code itemsadder}, {@code craftengine}...
+     */
+    public static final RegistryType<CanvasPackTarget> CANVAS_PACK_TARGET = RegistryType.createOpen(ZMenuKeys.key("canvas_pack_target"), CanvasPackTarget.class);
+
+    /**
+     * The element types a dialog canvas can draw, by their {@code type}: {@code image}, {@code text}...
+     */
+    public static final RegistryType<CanvasElementLoader> CANVAS_ELEMENT = RegistryType.createOpen(ZMenuKeys.key("canvas_element"), CanvasElementLoader.class);
+
+    public static final RegistryType<DialogActionLoader> DIALOG_ACTION = RegistryType.createOpen(ZMenuKeys.key("dialog_action"), DialogActionLoader.class);
 
     private Registries() {
     }

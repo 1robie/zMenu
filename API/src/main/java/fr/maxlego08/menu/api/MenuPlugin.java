@@ -4,6 +4,7 @@ import com.tcoded.folialib.impl.PlatformScheduler;
 import fr.maxlego08.menu.api.attribute.AttributApplier;
 import fr.maxlego08.menu.api.command.CommandManager;
 import fr.maxlego08.menu.api.configuration.Feature;
+import fr.maxlego08.menu.api.dialog.canvas.CanvasManager;
 import fr.maxlego08.menu.api.dupe.DupeManager;
 import fr.maxlego08.menu.api.enchantment.Enchantments;
 import fr.maxlego08.menu.api.itemstack.ItemStackService;
@@ -22,6 +23,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -300,6 +302,16 @@ public interface MenuPlugin extends Plugin {
     ToastHelper getToastHelper();
 
     DialogManager getDialogManager();
+
+    /**
+     * Returns the manager of dialog canvases, which draws images and text at pixel positions inside
+     * dialogs. Null when the server cannot show dialogs.
+     *
+     * @return the canvas manager, or null
+     */
+    default @Nullable CanvasManager getCanvasManager() {
+        return null;
+    }
 
     /**
      * Returns the client version manager, used to know which Minecraft version a player's

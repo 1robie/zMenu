@@ -70,6 +70,22 @@ public enum Message implements IMessage {
     DIALOG_OPEN_ERROR_NOT_FOUND("&cImpossible to find the dialog &f%name%&c."),
     DIALOG_OPEN_ERROR_CONSOLE("&cOnly one player can open a dialog."),
     DIALOG_NOT_SUPPORTED("&cYour Minecraft version does not support this menu, you need at least &f%version%&c."),
+    DIALOG_CANVAS_DISABLED("&cDialog canvases are not enabled on this server."),
+    DIALOG_CANVAS_INFO(
+            "&fDialog canvases",
+            "&7Pack target: &f%target%",
+            "&7Pack: &f%pack%",
+            "&7Canvases: &f%canvases% &7in &f%dialogs% &7dialogs, &f%static% &7drawn once for every player",
+            "&7Problems: &f%problems%"
+    ),
+    DIALOG_CANVAS_PROBLEM("&e%dialog% &8» &7%problem%"),
+    DIALOG_CANVAS_PLAYER(
+            "&fPlayer &b%player%",
+            "&7Client: &f%version%&7, Bedrock: &f%bedrock%",
+            "&7Resource pack: &f%pack%",
+            "&7Sees canvases: &f%canvas%",
+            "&7Canvas state: &f%state%"
+    ),
 
     BEDROCK_OPEN_SUCCESS("&aYou have just opened the bedrock inventory &f%name%&a."),
     BEDROCK_OPEN_SUCCESS_OTHER("&aYou have just opened the bedrock inventory &f%name%&a to the &3%player%&a."),
