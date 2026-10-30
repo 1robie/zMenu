@@ -3,6 +3,11 @@
 shadow = "9.6.1"
 groupez = "1.0.0"
 paperweight = "2.0.0-beta.23"
+run-paper = "3.1.0"
+
+# Plugins the test servers can download (runPlugins property)
+run-viaversion = "5.12.2"
+run-luckperms = "v5.5.71-bukkit"
 
 # Platforms (Paper / Spigot / NMS)
 paper-api = "1.21.11-R0.1-SNAPSHOT"
@@ -116,3 +121,4 @@ groupez-publish = { id = "re.alwyn974.groupez.publish", version.ref = "groupez" 
 
 # Platforms
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
